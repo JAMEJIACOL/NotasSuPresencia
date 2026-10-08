@@ -1,0 +1,1382 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Biblioteca de Prédicas & Apuntes Visuales | El Lugar de Su Presencia</title>
+
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- Google Fonts: Editorial Serif (Fraunces & Playfair) + Clean Modern Sans (Plus Jakarta Sans) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;0,9..144,700;0,9..144,800;1,9..144,400;1,9..144,600&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Space+Grotesk:wght@600;700&display=swap" rel="stylesheet">
+
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+
+  <!-- html2canvas for high quality PNG export -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            sand: {
+              50: '#FAF8F4',
+              100: '#F4EFE6',
+              200: '#E8DFC8',
+              300: '#D5C7AA',
+            },
+            forest: {
+              700: '#204230',
+              800: '#173426',
+              900: '#0F2319',
+              950: '#091610',
+            },
+            terracotta: {
+              400: '#E07658',
+              500: '#C25E3E',
+              600: '#A3482C',
+              700: '#85351E',
+            },
+            parchment: '#FCFAF6',
+            ink: '#221E1B',
+            muted: '#68605A'
+          },
+          fontFamily: {
+            sans: ['"Plus Jakarta Sans"', 'sans-serif'],
+            serif: ['"Fraunces"', 'serif'],
+            mono: ['"Space Grotesk"', 'monospace']
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    @media print {
+      body {
+        background: #FAF8F4 !important;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+      }
+      .no-print {
+        display: none !important;
+      }
+      #modal-content {
+        max-width: 100% !important;
+        padding: 0 !important;
+        box-shadow: none !important;
+      }
+    }
+
+    .paper-texture {
+      background-image: radial-gradient(rgba(34, 30, 27, 0.035) 1px, transparent 0);
+      background-size: 20px 20px;
+    }
+
+    /* Custom smooth scrollbar */
+    ::-webkit-scrollbar {
+      width: 7px;
+      height: 7px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #F4EFE6;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #D5C7AA;
+      border-radius: 999px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: #C25E3E;
+    }
+  </style>
+</head>
+
+<body class="bg-sand-100 text-ink font-sans antialiased min-h-screen paper-texture selection:bg-terracotta-500 selection:text-white pb-20">
+
+  <!-- Main Top Banner Navigation -->
+  <header class="bg-forest-950 text-sand-50 sticky top-0 z-40 border-b border-forest-800/80 shadow-md backdrop-blur-md bg-opacity-95 no-print">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 py-3.5 flex flex-wrap items-center justify-between gap-4">
+      
+      <!-- Logo & Brand -->
+      <div class="flex items-center gap-3">
+        <div class="w-10 h-10 rounded-2xl bg-gradient-to-tr from-terracotta-600 to-amber-500 text-white flex items-center justify-center shadow-lg">
+          <i data-lucide="book-marked" class="w-5 h-5"></i>
+        </div>
+        <div>
+          <span class="text-xs uppercase font-extrabold tracking-widest text-amber-300 block leading-tight">El Lugar de Su Presencia</span>
+          <h1 class="font-serif text-lg sm:text-xl font-bold tracking-tight text-white leading-tight">Biblioteca de Apuntes & Infografías</h1>
+        </div>
+      </div>
+
+      <!-- Quick Metrics & Add Action -->
+      <div class="flex items-center gap-3">
+        <!-- Stat Counter Element -->
+        <span id="stat-count" class="hidden md:inline-flex text-xs font-bold text-amber-200 bg-forest-900/90 px-3 py-1.5 rounded-xl border border-forest-800">
+          Cargando biblioteca...
+        </span>
+
+        <!-- Live Sync Status Pill -->
+        <button onclick="openConfigModal()" title="Configurar conexión con Google Sheets" class="inline-flex items-center gap-1.5 text-xs text-sand-200/90 bg-forest-900/80 hover:bg-forest-850 px-3 py-1.5 rounded-xl border border-forest-800 transition-all cursor-pointer">
+          <i data-lucide="sheet" class="w-3.5 h-3.5 text-emerald-400"></i>
+          <span id="sync-source-label">Google Sheets</span>
+          <span id="sync-indicator" class="w-2 h-2 rounded-full bg-emerald-400 ml-0.5 animate-pulse"></span>
+        </button>
+
+        <button onclick="refreshData()" title="Recargar y sincronizar datos" class="w-8 h-8 rounded-xl bg-forest-900 hover:bg-forest-850 border border-forest-800 flex items-center justify-center text-sand-200 transition-all cursor-pointer" id="btn-refresh">
+          <i data-lucide="refresh-cw" class="w-3.5 h-3.5" id="refresh-icon"></i>
+        </button>
+
+        <button onclick="openNewSermonModal()" class="inline-flex items-center gap-2 px-3.5 py-2 text-xs font-bold rounded-xl bg-terracotta-500 hover:bg-terracotta-600 text-white shadow-md transition-all active:scale-95 cursor-pointer">
+          <i data-lucide="plus-circle" class="w-4 h-4"></i>
+          <span class="hidden sm:inline">Añadir Prédica</span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Hero Banner with Welcome Purpose -->
+  <section class="max-w-7xl mx-auto px-4 sm:px-6 pt-8 pb-4 no-print">
+    <div class="bg-gradient-to-br from-forest-900 via-forest-850 to-forest-950 rounded-3xl p-6 sm:p-10 text-sand-50 border border-forest-800 shadow-xl relative overflow-hidden">
+      <div class="absolute -right-10 -bottom-10 w-72 h-72 bg-terracotta-500/10 rounded-full blur-3xl pointer-events-none"></div>
+      
+      <div class="max-w-3xl relative z-10">
+        <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full text-[11px] font-black uppercase tracking-widest bg-amber-400/20 text-amber-300 border border-amber-400/30 mb-3">
+          <i data-lucide="sparkles" class="w-3.5 h-3.5"></i>
+          Herramienta de Estudio Bíblico Personal & Grupos de Conexión
+        </div>
+        <h2 class="text-2xl sm:text-4xl md:text-5xl font-black font-sans uppercase tracking-tight text-white leading-tight mb-3">
+          Estudia y profundiza cada enseñanza dominical
+        </h2>
+        <p class="text-sm sm:text-base text-sand-200/90 leading-relaxed font-sans mb-6">
+          Accede a las láminas de infografía de alta densidad creadas con la skill <strong class="text-white">su-presencia</strong>. Revisa las citas bíblicas, anécdotas reales del pastor, principios financieros y descarga o imprime la lámina para tus apuntes personales.
+        </p>
+      </div>
+
+      <!-- Live Search & Interactive Filter Ribbon -->
+      <div class="bg-white/10 backdrop-blur-md p-4 rounded-2xl border border-white/15 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-12 gap-3 relative z-10">
+        
+        <!-- Search Keyword Input -->
+        <div class="lg:col-span-5 relative">
+          <i data-lucide="search" class="w-4 h-4 text-sand-300 absolute left-3.5 top-3.5"></i>
+          <input 
+            type="text" 
+            id="search-input" 
+            oninput="filterSermons()" 
+            placeholder="Buscar por título, versículo, tema o palabra clave..." 
+            class="w-full pl-10 pr-4 py-2.5 bg-forest-950/70 border border-sand-300/30 rounded-xl text-xs sm:text-sm text-sand-50 placeholder-sand-300/60 focus:outline-none focus:ring-2 focus:ring-amber-400"
+          >
+        </div>
+
+        <!-- Filter by Preacher -->
+        <div class="lg:col-span-3">
+          <select 
+            id="filter-preacher" 
+            onchange="filterSermons()" 
+            class="w-full px-3.5 py-2.5 bg-forest-950/70 border border-sand-300/30 rounded-xl text-xs sm:text-sm text-sand-50 focus:outline-none focus:ring-2 focus:ring-amber-400"
+          >
+            <option value="ALL">Todos los Predicadores</option>
+            <option value="Andrés Corson">Pastor Andrés Corson</option>
+            <option value="Rocío Corson">Pastora Rocío Corson</option>
+            <option value="Henry Pabón">Pastor Henry Pabón</option>
+            <option value="Invitados">Pastores Invitados</option>
+          </select>
+        </div>
+
+        <!-- Filter by Category/Topic -->
+        <div class="lg:col-span-2">
+          <select 
+            id="filter-category" 
+            onchange="filterSermons()" 
+            class="w-full px-3.5 py-2.5 bg-forest-950/70 border border-sand-300/30 rounded-xl text-xs sm:text-sm text-sand-50 focus:outline-none focus:ring-2 focus:ring-amber-400"
+          >
+            <option value="ALL">Todas las Temáticas</option>
+            <option value="Finanzas">Finanzas & Mayordomía</option>
+            <option value="Familia">Familia & Matrimonio</option>
+            <option value="Sanidad">Sanidad & Perdón</option>
+            <option value="Oración">Oración & Presencia</option>
+            <option value="Liderazgo">Carácter & Liderazgo</option>
+          </select>
+        </div>
+
+        <!-- Order by Date -->
+        <div class="lg:col-span-2">
+          <select 
+            id="filter-sort" 
+            onchange="filterSermons()" 
+            class="w-full px-3.5 py-2.5 bg-forest-950/70 border border-sand-300/30 rounded-xl text-xs sm:text-sm text-sand-50 focus:outline-none focus:ring-2 focus:ring-amber-400"
+          >
+            <option value="NEWEST">Más recientes</option>
+            <option value="OLDEST">Más antiguas</option>
+          </select>
+        </div>
+
+      </div>
+
+    </div>
+  </section>
+
+  <!-- Tag Pills Filter Bar -->
+  <section class="max-w-7xl mx-auto px-4 sm:px-6 my-4 no-print flex flex-wrap items-center gap-2">
+    <span class="text-xs font-bold text-stone-500 uppercase tracking-wider mr-1">Temas Populares:</span>
+    <button onclick="setTopicTag('Finanzas')" class="px-3 py-1 rounded-full text-xs font-semibold bg-white border border-sand-300 text-stone-700 hover:bg-forest-800 hover:text-white transition-all shadow-sm">💰 Finanzas Bíblicas</button>
+    <button onclick="setTopicTag('Contentamiento')" class="px-3 py-1 rounded-full text-xs font-semibold bg-white border border-sand-300 text-stone-700 hover:bg-forest-800 hover:text-white transition-all shadow-sm">⚖️ Contentamiento</button>
+    <button onclick="setTopicTag('Ahorro')" class="px-3 py-1 rounded-full text-xs font-semibold bg-white border border-sand-300 text-stone-700 hover:bg-forest-800 hover:text-white transition-all shadow-sm">🐜 Ley de la Hormiga</button>
+    <button onclick="setTopicTag('Cero Deuda')" class="px-3 py-1 rounded-full text-xs font-semibold bg-white border border-sand-300 text-stone-700 hover:bg-forest-800 hover:text-white transition-all shadow-sm">⛓️ Cero Deudas</button>
+    <button onclick="setTopicTag('Oración')" class="px-3 py-1 rounded-full text-xs font-semibold bg-white border border-sand-300 text-stone-700 hover:bg-forest-800 hover:text-white transition-all shadow-sm">🔥 Intimidad con Dios</button>
+    <button onclick="setTopicTag('Familia')" class="px-3 py-1 rounded-full text-xs font-semibold bg-white border border-sand-300 text-stone-700 hover:bg-forest-800 hover:text-white transition-all shadow-sm">🏡 Matrimonio & Hijos</button>
+    <button onclick="clearAllFilters()" class="px-3 py-1 rounded-full text-xs font-bold text-terracotta-600 hover:underline ml-auto">Limpiar filtros</button>
+  </section>
+
+  <!-- Sermons Grid Display -->
+  <main class="max-w-7xl mx-auto px-4 sm:px-6 mt-6 no-print">
+    
+    <!-- Results Header -->
+    <div class="flex items-center justify-between mb-6 pb-2 border-b border-sand-200">
+      <div>
+        <h3 class="text-xl sm:text-2xl font-black uppercase tracking-tight text-forest-950 flex items-center gap-2">
+          <i data-lucide="layout-grid" class="w-6 h-6 text-terracotta-500"></i>
+          Catálogo de Prédicas & Cuadernos de Estudio
+        </h3>
+        <p class="text-xs text-stone-500">Haz clic en cualquier tarjeta para abrir la lámina completa de infografía</p>
+      </div>
+      <span id="results-count" class="text-xs font-bold text-forest-800 bg-sand-200/70 px-3 py-1 rounded-full">
+        Mostrando resultados
+      </span>
+    </div>
+
+    <!-- The Grid Container -->
+    <div id="sermons-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      <!-- Dynamically Rendered by JS -->
+    </div>
+
+    <!-- Empty State Message -->
+    <div id="empty-state" class="hidden text-center py-16 bg-white rounded-3xl border border-dashed border-sand-300 p-8">
+      <div class="w-16 h-16 rounded-2xl bg-sand-100 text-terracotta-500 flex items-center justify-center mx-auto mb-4">
+        <i data-lucide="search-x" class="w-8 h-8"></i>
+      </div>
+      <h4 class="font-serif text-xl font-bold text-forest-950 mb-1">No encontramos prédicas con ese criterio</h4>
+      <p class="text-xs text-stone-500 max-w-md mx-auto mb-4">Prueba buscando con palabras como "escasez", "Andrés Corson", "Proverbios" o limpia los filtros activos.</p>
+      <button onclick="clearAllFilters()" class="px-4 py-2 bg-forest-800 text-sand-50 rounded-xl text-xs font-bold hover:bg-forest-900 transition-all">
+        Restablecer Búsqueda
+      </button>
+    </div>
+
+  </main>
+
+  <!-- Toast Notification -->
+  <div id="toast" class="fixed top-5 right-5 z-50 transform -translate-y-24 opacity-0 transition-all duration-300 pointer-events-none bg-stone-900 text-white px-5 py-3 rounded-2xl shadow-2xl flex items-center gap-3 text-sm border border-stone-700">
+    <i data-lucide="check-circle-2" class="w-5 h-5 text-terracotta-400"></i>
+    <span id="toast-text">Acción completada con éxito</span>
+  </div>
+
+  <!-- MODAL: Full Infographic & Study Sheet Interactive Viewer -->
+  <div id="infographic-modal" class="fixed inset-0 z-50 bg-stone-950/80 backdrop-blur-md overflow-y-auto hidden flex justify-center p-2 sm:p-4 md:p-6 transition-all duration-300">
+    
+    <div class="relative w-full max-w-5xl bg-parchment rounded-3xl border border-sand-300 shadow-2xl my-auto overflow-hidden animate-in fade-in zoom-in-95 duration-200">
+      
+      <!-- Modal Floating Action Bar (Sticky Top) -->
+      <div class="sticky top-0 z-30 bg-forest-950/95 backdrop-blur-md text-sand-50 px-4 sm:px-8 py-3 flex flex-wrap items-center justify-between gap-3 border-b border-forest-800 no-print">
+        <div class="flex items-center gap-2">
+          <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-bold bg-forest-900 text-sand-50 tracking-wide uppercase border border-forest-700">
+            <i data-lucide="layers" class="w-3.5 h-3.5 text-terracotta-400"></i>
+            Lámina Infográfica
+          </span>
+          <span id="modal-date-tag" class="text-xs text-sand-300/80 hidden sm:inline"></span>
+        </div>
+
+        <div class="flex items-center gap-2">
+          <a id="modal-yt-btn" href="#" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-2 px-3 py-1.5 text-xs font-bold rounded-xl bg-red-600 hover:bg-red-700 text-white shadow-sm transition-all hover:scale-105">
+            <i data-lucide="youtube" class="w-4 h-4"></i>
+            <span class="hidden sm:inline">Ver en YouTube</span>
+          </a>
+
+          <button onclick="window.print()" class="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold rounded-xl bg-forest-900 hover:bg-forest-800 text-sand-200 border border-forest-700 transition-all">
+            <i data-lucide="printer" class="w-4 h-4"></i>
+            <span class="hidden sm:inline">Imprimir / PDF</span>
+          </button>
+
+          <button onclick="downloadCurrentPNG()" class="inline-flex items-center gap-1.5 px-3.5 py-1.5 text-xs font-bold rounded-xl bg-terracotta-500 hover:bg-terracotta-600 text-white shadow-md transition-all active:scale-95">
+            <i data-lucide="download" class="w-4 h-4 text-amber-200"></i>
+            <span>Exportar PNG</span>
+          </button>
+
+          <button onclick="closeModal()" class="w-8 h-8 rounded-xl bg-forest-900 hover:bg-red-500/20 text-sand-200 hover:text-white flex items-center justify-center transition-all ml-1">
+            <i data-lucide="x" class="w-5 h-5"></i>
+          </button>
+        </div>
+      </div>
+
+      <!-- Canvas Render Container for Infographic Image Capture -->
+      <div id="modal-content" class="p-5 sm:p-10 md:p-12 relative overflow-hidden bg-parchment">
+        <!-- Rendered dynamically by openInfographic(id) -->
+      </div>
+
+    </div>
+  </div>
+
+  <!-- MODAL: Add New Sermon / Infographic Form -->
+  <div id="new-sermon-modal" class="fixed inset-0 z-50 bg-stone-950/80 backdrop-blur-md hidden flex items-center justify-center p-4">
+    <div class="w-full max-w-xl bg-white rounded-3xl p-6 sm:p-8 border border-sand-300 shadow-2xl relative">
+      <div class="flex items-center justify-between pb-4 border-b border-sand-200 mb-5">
+        <div>
+          <span class="text-[11px] font-black uppercase tracking-wider text-terracotta-600">Alimentar la Biblioteca</span>
+          <h3 class="font-serif text-xl sm:text-2xl font-bold text-forest-950">Añadir Nueva Prédica</h3>
+        </div>
+        <button onclick="closeNewSermonModal()" class="w-8 h-8 rounded-xl bg-sand-100 text-stone-600 hover:bg-stone-200 flex items-center justify-center">
+          <i data-lucide="x" class="w-4 h-4"></i>
+        </button>
+      </div>
+
+      <form id="new-sermon-form" onsubmit="handleNewSermon(event)" class="space-y-4">
+        <div>
+          <label class="block text-xs font-bold text-stone-700 uppercase mb-1">Título de la Prédica</label>
+          <input type="text" id="add-title" required placeholder="Ej. El poder de la gratitud en tiempos difíciles" class="w-full px-3.5 py-2.5 rounded-xl border border-sand-300 text-xs sm:text-sm focus:ring-2 focus:ring-forest-800 focus:outline-none">
+        </div>
+
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block text-xs font-bold text-stone-700 uppercase mb-1">Predicador</label>
+            <input type="text" id="add-preacher" required placeholder="Ej. Pastor Andrés Corson" class="w-full px-3.5 py-2.5 rounded-xl border border-sand-300 text-xs sm:text-sm focus:ring-2 focus:ring-forest-800 focus:outline-none">
+          </div>
+          <div>
+            <label class="block text-xs font-bold text-stone-700 uppercase mb-1">Fecha</label>
+            <input type="date" id="add-date" required class="w-full px-3.5 py-2.5 rounded-xl border border-sand-300 text-xs sm:text-sm focus:ring-2 focus:ring-forest-800 focus:outline-none">
+          </div>
+        </div>
+
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block text-xs font-bold text-stone-700 uppercase mb-1">Versículo Ancla</label>
+            <input type="text" id="add-scripture" required placeholder="Ej. Filipenses 4:6-7" class="w-full px-3.5 py-2.5 rounded-xl border border-sand-300 text-xs sm:text-sm focus:ring-2 focus:ring-forest-800 focus:outline-none">
+          </div>
+          <div>
+            <label class="block text-xs font-bold text-stone-700 uppercase mb-1">Categoría</label>
+            <select id="add-category" class="w-full px-3.5 py-2.5 rounded-xl border border-sand-300 text-xs sm:text-sm focus:ring-2 focus:ring-forest-800 focus:outline-none">
+              <option value="Finanzas">Finanzas & Mayordomía</option>
+              <option value="Familia">Familia & Matrimonio</option>
+              <option value="Sanidad">Sanidad & Perdón</option>
+              <option value="Oración">Oración & Presencia</option>
+              <option value="Liderazgo">Carácter & Liderazgo</option>
+            </select>
+          </div>
+        </div>
+
+        <div>
+          <label class="block text-xs font-bold text-stone-700 uppercase mb-1">URL de YouTube</label>
+          <input type="url" id="add-url" required placeholder="https://www.youtube.com/watch?v=..." class="w-full px-3.5 py-2.5 rounded-xl border border-sand-300 text-xs sm:text-sm focus:ring-2 focus:ring-forest-800 focus:outline-none">
+        </div>
+
+        <div>
+          <label class="block text-xs font-bold text-stone-700 uppercase mb-1">La Gran Idea (Tesis)</label>
+          <textarea id="add-idea" rows="2" required placeholder="Resumen del mensaje en 1 frase memorable..." class="w-full px-3.5 py-2 rounded-xl border border-sand-300 text-xs sm:text-sm focus:ring-2 focus:ring-forest-800 focus:outline-none"></textarea>
+        </div>
+
+        <div class="pt-3 border-t border-sand-200 flex items-center justify-end gap-3">
+          <button type="button" onclick="closeNewSermonModal()" class="px-4 py-2 text-xs font-bold text-stone-600 hover:bg-sand-100 rounded-xl transition-all">Cancelar</button>
+          <button type="submit" class="px-5 py-2.5 text-xs font-bold rounded-xl bg-forest-900 hover:bg-forest-950 text-white shadow-md transition-all">Guardar en Biblioteca</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL: Google Sheets & Drive Connection Configuration -->
+  <div id="config-modal" class="fixed inset-0 z-50 bg-stone-950/80 backdrop-blur-md hidden flex items-center justify-center p-4">
+    <div class="w-full max-w-2xl bg-white rounded-3xl p-6 sm:p-8 border border-sand-300 shadow-2xl relative max-h-[90vh] overflow-y-auto">
+      <div class="flex items-center justify-between pb-4 border-b border-sand-200 mb-5">
+        <div class="flex items-center gap-3">
+          <div class="w-10 h-10 rounded-2xl bg-emerald-500/10 text-emerald-600 flex items-center justify-center">
+            <i data-lucide="sheet" class="w-5 h-5"></i>
+          </div>
+          <div>
+            <span class="text-[11px] font-black uppercase tracking-wider text-emerald-600">Sincronización en la Nube</span>
+            <h3 class="font-serif text-xl sm:text-2xl font-bold text-forest-950">Conectar con Google Drive / Sheets</h3>
+          </div>
+        </div>
+        <button onclick="closeConfigModal()" class="w-8 h-8 rounded-xl bg-sand-100 text-stone-600 hover:bg-stone-200 flex items-center justify-center cursor-pointer">
+          <i data-lucide="x" class="w-4 h-4"></i>
+        </button>
+      </div>
+
+      <div class="space-y-4 text-xs sm:text-sm text-stone-600">
+        <p>
+          Puedes alimentar tu biblioteca directamente desde una hoja de cálculo en tu Google Drive. Cada vez que añadas una fila en tu Google Sheets, la página web la leerá automáticamente sin tener que tocar código ni volver a subir archivos a GitHub.
+        </p>
+
+        <div class="bg-sand-50 rounded-2xl p-4 border border-sand-200 space-y-2">
+          <h4 class="font-bold text-forest-950 flex items-center gap-2">
+            <i data-lucide="help-circle" class="w-4 h-4 text-terracotta-500"></i>
+            ¿Cómo publicarlo en 3 pasos?
+          </h4>
+          <ol class="list-decimal list-inside space-y-1 text-stone-700 text-xs">
+            <li>Crea una hoja de cálculo en tu Google Drive con las columnas: <code class="bg-sand-200 px-1 py-0.5 rounded text-[11px]">id, title, preacher, date, formattedDate, duration, category, tags, youtubeUrl, anchorVerse, anchorText, coreThesis, thesisDetail</code></li>
+            <li>En Google Sheets ve a <strong>Archivo &gt; Compartir &gt; Publicar en la web</strong>.</li>
+            <li>Elige <strong>Valores separados por comas (.csv)</strong> o toda la hoja y copia el enlace generado aquí abajo.</li>
+          </ol>
+        </div>
+
+        <div>
+          <label class="block text-xs font-bold text-stone-700 uppercase mb-1.5">URL de Google Sheets Publicado (CSV o Web App JSON)</label>
+          <input 
+            type="url" 
+            id="sheets-url-input" 
+            placeholder="https://docs.google.com/spreadsheets/d/e/.../pub?output=csv" 
+            class="w-full px-3.5 py-2.5 rounded-xl border border-sand-300 text-xs sm:text-sm focus:ring-2 focus:ring-emerald-500 focus:outline-none"
+          >
+          <p class="text-[11px] text-stone-400 mt-1">Si dejas este campo vacío, la web usará los datos locales predeterminados.</p>
+        </div>
+
+        <div class="pt-4 border-t border-sand-200 flex flex-wrap items-center justify-between gap-3">
+          <button 
+            type="button" 
+            onclick="resetToDefaultData()" 
+            class="px-3.5 py-2 text-xs font-semibold text-stone-600 hover:text-red-600 hover:bg-sand-100 rounded-xl transition-all cursor-pointer"
+          >
+            Restablecer a datos locales
+          </button>
+          <div class="flex items-center gap-2">
+            <button 
+              type="button" 
+              onclick="closeConfigModal()" 
+              class="px-4 py-2 text-xs font-bold text-stone-600 hover:bg-sand-100 rounded-xl transition-all cursor-pointer"
+            >
+              Cancelar
+            </button>
+            <button 
+              type="button" 
+              onclick="saveSheetsConfig()" 
+              class="px-5 py-2.5 text-xs font-bold rounded-xl bg-forest-900 hover:bg-forest-950 text-white shadow-md transition-all cursor-pointer flex items-center gap-2"
+            >
+              <i data-lucide="save" class="w-4 h-4"></i>
+              Guardar y Sincronizar
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // In-memory initial database of sermons (seeded with the analyzed Su Presencia sermon and key series)
+    let sermonDatabase = [
+      {
+        id: "vivir-en-escasez",
+        title: "¿Cómo Vivir en Escasez para Tener Abundancia?",
+        preacher: "Pastor Andrés Corson",
+        date: "2026-05-10",
+        formattedDate: "10 de Mayo, 2026",
+        duration: "37 Minutos",
+        category: "Finanzas",
+        tags: ["Finanzas", "Ahorro", "Cero Deuda", "Contentamiento", "Proverbios"],
+        youtubeUrl: "https://www.youtube.com/watch?v=yVGzJHknqgI",
+        anchorVerse: "Proverbios 13:11",
+        anchorText: "El dinero mal habido pronto se acaba, pero quien ahorra poco a poco se enriquece.",
+        coreThesis: "No puedes experimentar la verdadera abundancia si primero no dominas el arte espiritual de vivir contento y disciplinado en la escasez.",
+        thesisDetail: "La escasez no es una maldición ni un castigo; es el aula formativa de Dios. En ella se mata el orgullo de aparentar, se aprende a valorar cada centavo, se extermina la deuda y se despierta la recursividad que luego administrará grandes recursos con fidelidad.",
+        pillars: [
+          {
+            num: 1,
+            verse: "Filipenses 4:12",
+            title: "Contentamiento Radical y Cero Aparentar",
+            desc: "El ahorro es imposible cuando se vive intentando impresionar a otros con un estilo de vida que no se puede pagar. Saber tener escasez es disfrutar la vida sin lujos ni vergüenza.",
+            highlight: "La riqueza divina no añade tristeza."
+          },
+          {
+            num: 2,
+            verse: "1 Samuel 17:34",
+            title: "Despierta al León: Recursividad",
+            desc: "La sobreprotección ahoga el potencial de los hijos y los vuelve parásitos. La dificultad y el trabajo duro desde jóvenes despiertan el león interior y la capacidad de resolver problemas.",
+            highlight: "Hacer más con menos dinero."
+          },
+          {
+            num: 3,
+            verse: "2 Reyes 4:1-7",
+            title: "El Mito de la 'Deuda Buena'",
+            desc: "No existe la deuda sana cuando compromete tu paz y te hace esclavo del acreedor. El crédito a 15 años duplica el costo y engulle la bendición familiar a través de intereses usureros.",
+            highlight: "Cero deudas para disfrutar la vida."
+          },
+          {
+            num: 4,
+            verse: "Proverbios 6:6-8",
+            title: "La Hormiga: Meta del 50% de Ahorro",
+            desc: "Guardar en el verano para el invierno. Andrés y Rocío fijaron la meta radical de diezmar el 10% y ahorrar hasta el 50% de sus ingresos durante sus años jóvenes antes de asumir grandes gastos.",
+            highlight: "Ahorrar sistemáticamente poco a poco."
+          },
+          {
+            num: 5,
+            verse: "Salmo 124:7",
+            title: "Paz y Libertad Sobre Negocio",
+            desc: "Si estás asfixiado por deudas, no esperes a hacer 'el negocio del siglo' para vender. Es preferible liquidar un bien o un auto perdiendo margen con tal de romper las cadenas con el banco.",
+            highlight: "Escapar de la trampa del cazador."
+          },
+          {
+            num: 6,
+            verse: "Mateo 25:23",
+            title: "Fidelidad en lo Poco para Multiplicar",
+            desc: "La abundancia actual de Su Presencia (múltiples sedes sin deudas exorbitantes) nació de 15 años de sueldos austeros, equipos reciclados y ahorro disciplinado en el templo inicial.",
+            highlight: "En lo poco fiel, sobre mucho puesto."
+          }
+        ],
+        anecdotes: [
+          {
+            icon: "footprints",
+            title: "A pie en Funza (8 Años)",
+            text: "Durante su niñez y juventud no tuvieron auto. Caminaban entre 2 y 4 km diarios para tomar el bus de Funza y llegar a la iglesia. Esto forjó resistencia física, les ahorró millones y cuidó la salud de toda la familia.",
+            quote: "Caminar ahorra pasajes y visitas al médico."
+          },
+          {
+            icon: "glass-water",
+            title: "La cuenta de $39.000 en jugo",
+            text: "Andrés salió a comer con una persona endeudada que pidió una limonada de $12.000, no le gustó, pidió otra y sumó una cuenta absurda. Mucha gente debe dinero pero sigue comiendo afuera como si fuera multimillonaria.",
+            quote: "Gente que vive asfixiada pagando gustos de ricos."
+          },
+          {
+            icon: "file-text",
+            title: "Trabajando desde los 13 Años",
+            text: "Traducía cartas de niños apadrinados en inglés en una máquina de escribir manual. Cobraba por carta traducida. Comprender lo difícil que es ganarse un peso erradica el hábito destructivo de malgastarlo en tonterías.",
+            quote: "El valor del trabajo temprano vence la pereza."
+          },
+          {
+            icon: "volume-2",
+            title: "Bafles en la 9ª con 19",
+            text: "En los inicios de la iglesia no tenían presupuesto para sonido importado. Andrés iba al centro de Bogotá, compraba bocinas sueltas, madera y armaba los bafles a pulso. La escasez desató la recursividad técnica de la congregación.",
+            quote: "Hacer sonido profesional con piezas artesanales."
+          },
+          {
+            icon: "heart-handshake",
+            title: "Micrófonos en la Luna de Miel",
+            text: "Cuando se casó con Rocío, en vez de gastar en hoteles cinco estrellas o toallas de lujo, invirtieron sus pocos ahorros en comprar micrófonos Shure para el servicio de adoración. Priorizaron la misión sobre la comodidad personal.",
+            quote: "Sacrificio conjunto de pareja por la visión."
+          },
+          {
+            icon: "home",
+            title: "El Crédito Hipotecario de 1995",
+            text: "Compraron casa confiando en el vendedor: pidieron $35 millones y a los meses debían $42 millones. Andrés reconoció su imprudencia: vendieron el auto, vendieron la casa perdiendo dinero, pagaron al banco y prometieron no volver a endeudarse.",
+            quote: "Vender y perder para recuperar la libertad."
+          }
+        ],
+        scriptures: [
+          { verse: "Filipenses 4:12", tag: "Contentamiento", desc: "Pablo aprendió el misterio de estar saciado y tener hambre; el gozo no depende de la cuenta bancaria." },
+          { verse: "Proverbios 10:22", tag: "Paz Interior", desc: "La bendición de Dios enriquece y no añade tristeza. Si un 'bien' te quita el sueño y te llena de deudas, no viene de Dios." },
+          { verse: "Romanos 8:28", tag: "Propósito", desc: "Dios usa los momentos de estrechez financiera para forjar obediencia, matar el ego y prepararnos para la administración." },
+          { verse: "Génesis 14:23", tag: "Independencia", desc: "Abraham rechaza las riquezas del rey de Sodoma para que ningún hombre pudiera decir: 'Yo enriquecí a Abraham'." },
+          { verse: "Proverbios 10:4 & 22:29", tag: "Diligencia", desc: "La mano floja empobrece, pero la diligencia enriquece. El hombre diestro en su trabajo estará delante de reyes." },
+          { verse: "1 Samuel 17:34-36", tag: "Carácter", desc: "David cuidando las pocas ovejas en el desierto y matando leones; el liderazgo se entrena en el trabajo silencioso y austero." },
+          { verse: "Proverbios 6:6-8", tag: "Previsión", desc: "La hormiga sin tener capitán almacena comida en verano para el invierno. El ahorro no espera a la crisis; se anticipa a ella." },
+          { verse: "2 Reyes 4:1-7", tag: "Prioridad Cero Deuda", desc: "El profeta Eliseo manda a la viuda endeudada a multiplicar el aceite y la primera orden es tajante: 'Paga a tus acreedores'." },
+          { verse: "Salmo 124:7", tag: "Escape de la Red", desc: "Nuestra alma escapó como un ave de la trampa de los cazadores. Se rompió el lazo bancario y fuimos libres." }
+        ],
+        punchlines: [
+          { title: "Frase Contundente #1", text: "Así como el sexo solo se disfruta plenamente dentro del matrimonio, la vida y el fruto del trabajo solo se disfrutan de verdad cuando no le debes un solo centavo a nadie." },
+          { title: "Frase Contundente #2", text: "Cuando estás atrapado en una deuda, no es tiempo de fingir ser el gran comerciante. Vende lo que tengas, pierde si es necesario, pero compra tu libertad." }
+        ],
+        checklist: [
+          { title: "1. Auditoría Sin Autoengaño", text: "Solicitar a los bancos la tabla de amortización real de tarjetas y créditos; calcular el monto neto de la deuda." },
+          { title: "2. Frenar Fugas y Gastos Hormiga", text: "Pausar comidas fuera de casa, limonadas caras, domicilios innecesarios y suscripciones hasta tener ahorros." },
+          { title: "3. Liquidar Activos para Pagar", text: "Listar pertenencias o vehículos que puedan venderse hoy mismo para amortizar directamente al capital más costoso." },
+          { title: "4. Iniciar el Ahorro Hormiga", text: "Apartar una cuota fija mensual intocable de ahorro (poco a poco), honrando primero el diezmo y la siembra." }
+        ]
+      },
+      {
+        id: "sanidad-del-alma",
+        title: "Sana tu Corazón para no Herir a Quienes Amas",
+        preacher: "Pastora Rocío Corson",
+        date: "2026-04-19",
+        formattedDate: "19 de Abril, 2026",
+        duration: "42 Minutos",
+        category: "Sanidad",
+        tags: ["Sanidad", "Perdón", "Familia", "Emociones"],
+        youtubeUrl: "https://www.youtube.com/results?search_query=su+presencia+rocio+corson+sanidad",
+        anchorVerse: "Proverbios 4:23",
+        anchorText: "Sobre toda cosa guardada, guarda tu corazón; porque de él mana la vida.",
+        coreThesis: "Las heridas no resueltas de nuestro pasado se convierten en el filtro amargo con el que interpretamos el presente y lastimamos a nuestra propia familia.",
+        thesisDetail: "Nadie puede dar lo que no ha recibido. Cuando llevamos dolores sin sanar, reaccionamos con ira, aislamiento o control excesivo. La cruz de Cristo no solo pagó por nuestros pecados, sino que cargó con todos nuestros dolores emocionales para darnos libertad absoluta.",
+        pillars: [
+          { num: 1, verse: "Salmo 147:3", title: "El Médico del Alma", desc: "Dios no juzga tus heridas; las venda con amor y aceite fresco.", highlight: "Él sana a los quebrantados de corazón." },
+          { num: 2, verse: "Efesios 4:31-32", title: "El Perdón como Decisión", desc: "Perdonar no es sentir ganas; es una orden de liberación personal.", highlight: "Quítense de vosotros toda amargura." },
+          { num: 3, verse: "Gálatas 5:1", title: "Rompe los Patrones", desc: "No heredes a tus hijos los silencios castigadores ni las palabras hirientes.", highlight: "Firmes en la libertad con que Cristo nos libertó." },
+          { num: 4, verse: "1 Juan 4:18", title: "Amor que Echa Fuera el Temor", desc: "El rechazo engendra miedo; la aceptación de Dios restaura la identidad.", highlight: "El perfecto amor echa fuera el temor." },
+          { num: 5, verse: "Filipenses 1:6", title: "Proceso Constante", desc: "La sanidad no siempre ocurre en un segundo; requiere caminar en verdad.", highlight: "El que comenzó la buena obra la perfeccionará." }
+        ],
+        anecdotes: [
+          { icon: "heart-crack", title: "La carta que nunca se envió", text: "Rocío explica cómo escribir un listado detallado de agravios y presentarlo delante de Jesús en oración permite desahogar el dolor sin intoxicar el hogar.", quote: "Escribir para perdonar, no para vengarse." },
+          { icon: "smile", title: "El espejo de la identidad", text: "La importancia de hablarse la Palabra de Dios cada mañana en lugar de creer las etiquetas descalificadoras de los compañeros de escuela o padres.", quote: "Tú vales la sangre preciosa de Cristo." }
+        ],
+        scriptures: [
+          { verse: "Proverbios 4:23", tag: "Guarda tu Corazón", desc: "Fuente de decisiones y vida espiritual." },
+          { verse: "Salmo 147:3", tag: "Restauración", desc: "Él venda personalmente nuestras llagas." },
+          { verse: "Efesios 4:32", tag: "Misericordia", desc: "Sed benignos, perdonándoos unos a otros." }
+        ],
+        punchlines: [
+          { title: "Declaración de Sanidad", text: "Si no permites que Dios cure tus heridas, sangrarás sobre personas que nunca te cortaron." }
+        ],
+        checklist: [
+          { title: "1. Lista de Descarga", text: "Identificar con nombre propio a quienes me causaron dolor y renunciar al derecho de cobrar venganza." },
+          { title: "2. Pedir Perdón", text: "Acercarme con humildad a quien haya lastimado con mis palabras o actitudes defensivas." },
+          { title: "3. Tiempo en el Secreto", text: "Dedicar 15 minutos diarios a permitir que el Espíritu Santo ministre paz a mi identidad." }
+        ]
+      },
+      {
+        id: "poder-oracion",
+        title: "Intimidad en el Lugar Secreto: Cómo Orar sin Aburrirse",
+        preacher: "Pastor Henry Pabón",
+        date: "2026-03-22",
+        formattedDate: "22 de Marzo, 2026",
+        duration: "45 Minutos",
+        category: "Oración",
+        tags: ["Oración", "Intimidad", "Espíritu Santo", "Presencia"],
+        youtubeUrl: "https://www.youtube.com/results?search_query=su+presencia+oracion+henry+pabon",
+        anchorVerse: "Mateo 6:6",
+        anchorText: "Pero tú, cuando ores, entra en tu aposento, y cerrada la puerta, ora a tu Padre que está en secreto.",
+        coreThesis: "La oración no es un monólogo monótono ni una lista de compras religiosa; es una conversación dinámica cara a cara con el Creador del universo.",
+        thesisDetail: "Muchos creyentes fracasan en la oración porque intentan rezar fórmulas ajenas. Cuando descubres la belleza de la alabanza, la intercesión guiada por la Palabra y el silencio reverente para escuchar la voz de Dios, la oración se convierte en el lugar más adictivo de la tierra.",
+        pillars: [
+          { num: 1, verse: "Mateo 6:6", title: "La Puerta Cerrada", desc: "Apagar notificaciones, cerrar distracciones y enfocar el corazón.", highlight: "Tu Padre que ve en lo secreto te recompensará." },
+          { num: 2, verse: "Salmo 100:4", title: "Entrar con Acción de Gracias", desc: "Comienza agradeciendo antes de pedir; la gratitud abre las puertas del atrio.", highlight: "Entrad por sus puertas con alabanza." },
+          { num: 3, verse: "Romanos 8:26", title: "El Auxilio del Espíritu", desc: "Cuando no sabemos qué orar, el Espíritu Santo gime e intercede en nosotros.", highlight: "El Espíritu nos ayuda en nuestra debilidad." },
+          { num: 4, verse: "Jeremías 33:3", title: "Escuchar en Silencio", desc: "La oración es bilateral: habla tú y luego quédate callado para recibir su dirección.", highlight: "Clama a mí y yo te responderé." },
+          { num: 5, verse: "1 Tesalonicenses 5:17", title: "Orad sin Cesar", desc: "Hacer de cada actividad cotidiana un diálogo continuo de comunión con Dios.", highlight: "Vivir en sintonía permanente." }
+        ],
+        anecdotes: [
+          { icon: "clock", title: "El reloj de 5 minutos", text: "Henry cuenta que cuando recién se convirtió, orar 5 minutos se sentía como una eternidad, hasta que aprendió a cantar los Salmos y a leer la Biblia de rodillas.", quote: "No cuentes minutos; cuenta comunión." }
+        ],
+        scriptures: [
+          { verse: "Mateo 6:6", tag: "El Secreto", desc: "La intimidad profunda que transforma la vida pública." },
+          { verse: "Salmo 100:4", tag: "Agradecimiento", desc: "La llave maestra de entrada a la Presencia." }
+        ],
+        punchlines: [
+          { title: "Principio de Altar", text: "El cristiano que se arrodilla en privado puede ponerse de pie frente a cualquier gigante en público." }
+        ],
+        checklist: [
+          { title: "1. Hora Intocable", text: "Definir un horario sagrado de 20 minutos donde los dispositivos queden fuera de la habitación." },
+          { title: "2. Orar los Salmos", text: "Leer un salmo en voz alta y convertir cada versículo en una oración personal." },
+          { title: "3. Diario de Oración", text: "Anotar peticiones y registrar las respuestas sobrenaturales de Dios." }
+        ]
+      }
+    ];
+
+    let currentOpenSermon = null;
+
+    // Google Sheets Config Storage Key
+    const SHEETS_CONFIG_KEY = "su_presencia_sheets_url";
+    const SERMONS_LOCAL_KEY = "su_presencia_custom_sermons";
+
+    // Initialize UI on load
+    window.addEventListener('DOMContentLoaded', () => {
+      loadStoredData();
+      updateStatistics();
+      lucide.createIcons();
+    });
+
+    // Load stored sermons or Google Sheets if configured
+    function loadStoredData() {
+      const savedSheetsUrl = localStorage.getItem(SHEETS_CONFIG_KEY);
+      if (savedSheetsUrl) {
+        document.getElementById('sheets-url-input').value = savedSheetsUrl;
+        document.getElementById('sync-source-label').textContent = 'Google Sheets (Sincronizado)';
+        fetchGoogleSheetsData(savedSheetsUrl);
+      } else {
+        const customSermons = localStorage.getItem(SERMONS_LOCAL_KEY);
+        if (customSermons) {
+          try {
+            const parsed = JSON.parse(customSermons);
+            if (Array.isArray(parsed) && parsed.length > 0) {
+              sermonDatabase = parsed;
+            }
+          } catch(e) {
+            console.warn("Could not parse local custom sermons", e);
+          }
+        }
+        renderSermons(sermonDatabase);
+      }
+    }
+
+    // Update Top Counters safely
+    function updateStatistics() {
+      const statEl = document.getElementById('stat-count');
+      if (statEl) {
+        statEl.textContent = `${sermonDatabase.length} Prédicas & Infografías de Estudio`;
+      }
+    }
+
+    // Google Sheets Sync Config Modal
+    function openConfigModal() {
+      const savedSheetsUrl = localStorage.getItem(SHEETS_CONFIG_KEY) || '';
+      document.getElementById('sheets-url-input').value = savedSheetsUrl;
+      document.getElementById('config-modal').classList.remove('hidden');
+      lucide.createIcons();
+    }
+
+    function closeConfigModal() {
+      document.getElementById('config-modal').classList.add('hidden');
+    }
+
+    function saveSheetsConfig() {
+      const url = document.getElementById('sheets-url-input').value.trim();
+      if (!url) {
+        localStorage.removeItem(SHEETS_CONFIG_KEY);
+        document.getElementById('sync-source-label').textContent = 'Datos locales';
+        closeConfigModal();
+        showToast("Configurado para usar datos locales");
+        return;
+      }
+      localStorage.setItem(SHEETS_CONFIG_KEY, url);
+      closeConfigModal();
+      document.getElementById('sync-source-label').textContent = 'Google Sheets';
+      showToast("Conectando con Google Sheets...");
+      fetchGoogleSheetsData(url);
+    }
+
+    function resetToDefaultData() {
+      localStorage.removeItem(SHEETS_CONFIG_KEY);
+      localStorage.removeItem(SERMONS_LOCAL_KEY);
+      document.getElementById('sheets-url-input').value = '';
+      document.getElementById('sync-source-label').textContent = 'Datos locales';
+      closeConfigModal();
+      location.reload();
+    }
+
+    // Refresh button
+    function refreshData() {
+      const refreshIcon = document.getElementById('refresh-icon');
+      if (refreshIcon) refreshIcon.classList.add('animate-spin');
+
+      const savedSheetsUrl = localStorage.getItem(SHEETS_CONFIG_KEY);
+      if (savedSheetsUrl) {
+        fetchGoogleSheetsData(savedSheetsUrl, () => {
+          if (refreshIcon) refreshIcon.classList.remove('animate-spin');
+        });
+      } else {
+        setTimeout(() => {
+          renderSermons(sermonDatabase);
+          updateStatistics();
+          if (refreshIcon) refreshIcon.classList.remove('animate-spin');
+          showToast("Biblioteca actualizada localmente");
+        }, 500);
+      }
+    }
+
+    // Fetch and parse Google Sheets CSV/JSON
+    async function fetchGoogleSheetsData(url, callback) {
+      try {
+        const response = await fetch(url);
+        const text = await response.text();
+        
+        // Simple CSV parser
+        if (text.includes(',') || text.includes('\t')) {
+          const parsedList = parseCSVToSermons(text);
+          if (parsedList && parsedList.length > 0) {
+            sermonDatabase = parsedList;
+            renderSermons(sermonDatabase);
+            updateStatistics();
+            showToast(`¡Sincronizado! ${parsedList.length} prédicas cargadas desde Google Sheets`);
+          } else {
+            showToast("No se encontraron filas válidas en Google Sheets");
+          }
+        }
+      } catch (err) {
+        console.error("Error sincronizando con Google Sheets", err);
+        showToast("Error de conexión al cargar Google Sheets. Verifica el enlace público.");
+      } finally {
+        if (callback) callback();
+      }
+    }
+
+    // Parse CSV rows into sermon objects
+    function parseCSVToSermons(csvText) {
+      const lines = csvText.split(/\r?\n/).filter(line => line.trim().length > 0);
+      if (lines.length <= 1) return [];
+
+      const headers = lines[0].split(',').map(h => h.trim().replace(/^"|"$/g, ''));
+      const list = [];
+
+      for (let i = 1; i < lines.length; i++) {
+        // Basic CSV regex split
+        const row = lines[i].split(/,(?=(?:(?:[^"]*"){2})*[^"]*$)/).map(v => v.trim().replace(/^"|"$/g, ''));
+        if (row.length < 2) continue;
+
+        const obj = {};
+        headers.forEach((h, index) => {
+          obj[h] = row[index] || '';
+        });
+
+        // Map into internal sermon schema with sensible fallbacks
+        list.push({
+          id: obj.id || `sermon-${i}`,
+          title: obj.title || "Prédica sin título",
+          preacher: obj.preacher || "Pastor Su Presencia",
+          date: obj.date || new Date().toISOString().split('T')[0],
+          formattedDate: obj.formattedDate || obj.date || "Fecha reciente",
+          duration: obj.duration || "40 Minutos",
+          category: obj.category || "General",
+          tags: obj.tags ? obj.tags.split(';').map(t => t.trim()) : [obj.category || "Estudio"],
+          youtubeUrl: obj.youtubeUrl || "https://www.youtube.com/@supresenciabogota",
+          anchorVerse: obj.anchorVerse || "Palabra de Dios",
+          anchorText: obj.anchorText || "Enseñanza bíblica impartida en El Lugar de Su Presencia.",
+          coreThesis: obj.coreThesis || obj.title || "Principio de vida y crecimiento espiritual.",
+          thesisDetail: obj.thesisDetail || "Notas de estudio extraídas para reflexión personal y grupos de conexión.",
+          pillars: [
+            { num: 1, verse: obj.anchorVerse || "Salmo 119:105", title: "Fundamento Bíblico", desc: "La base espiritual sobre la cual descansa la enseñanza.", highlight: "Firmeza en la Palabra" },
+            { num: 2, verse: "Santiago 1:22", title: "Hacedores", desc: "Poner por obra la palabra y no ser oidores olvidadizos.", highlight: "Aplicación diaria" },
+            { num: 3, verse: "Proverbios 3:5-6", title: "Confianza Plena", desc: "Reconocer a Dios en todos los caminos para recibir dirección.", highlight: "Fe inamovible" }
+          ],
+          anecdotes: [],
+          scriptures: [
+            { verse: obj.anchorVerse || "Biblia", tag: "Versículo Clave", desc: "Enseñanza central del mensaje." }
+          ],
+          punchlines: [
+            { title: "Declaración Central", text: obj.coreThesis || "Vivir conforme al diseño de Dios trae paz y bendición." }
+          ],
+          checklist: [
+            { title: "1. Meditación Semanal", text: "Repasar los puntos clave y citas bíblicas de la enseñanza." },
+            { title: "2. Acción Concreta", text: "Poner en práctica una decisión derivada del mensaje en el hogar o trabajo." }
+          ]
+        });
+      }
+
+      return list;
+    }
+
+    // Render Sermons Grid Cards
+    function renderSermons(list) {
+      const grid = document.getElementById('sermons-grid');
+      const emptyState = document.getElementById('empty-state');
+      const resultsCount = document.getElementById('results-count');
+
+      grid.innerHTML = '';
+
+      if (list.length === 0) {
+        grid.classList.add('hidden');
+        emptyState.classList.remove('hidden');
+        resultsCount.textContent = '0 encontradas';
+        return;
+      }
+
+      grid.classList.remove('hidden');
+      emptyState.classList.add('hidden');
+      resultsCount.textContent = `${list.length} disponibles`;
+
+      list.forEach(sermon => {
+        const card = document.createElement('div');
+        card.className = "bg-white rounded-3xl border border-sand-300/80 shadow-md hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex flex-col justify-between overflow-hidden group cursor-pointer";
+        card.onclick = () => openInfographic(sermon.id);
+
+        card.innerHTML = `
+          <!-- Card Editorial Header -->
+          <div class="p-6 pb-4">
+            <div class="flex items-center justify-between gap-2 mb-3">
+              <span class="inline-flex items-center gap-1.5 px-3 py-0.5 rounded-full text-[10px] font-extrabold uppercase tracking-wider bg-forest-900 text-sand-50">
+                <i data-lucide="tag" class="w-3 h-3 text-terracotta-400"></i>
+                ${sermon.category}
+              </span>
+              <span class="text-xs font-semibold text-stone-500">${sermon.formattedDate}</span>
+            </div>
+
+            <h4 class="font-sans font-black text-lg sm:text-xl text-forest-950 uppercase leading-snug mb-2 group-hover:text-terracotta-600 transition-colors">
+              ${sermon.title}
+            </h4>
+
+            <div class="flex items-center gap-2 text-xs font-semibold text-stone-600 mb-4">
+              <i data-lucide="mic-vocal" class="w-3.5 h-3.5 text-terracotta-500"></i>
+              <span>${sermon.preacher}</span>
+              <span class="text-stone-300">•</span>
+              <span class="text-stone-500">${sermon.duration}</span>
+            </div>
+
+            <!-- Verse Capsule -->
+            <div class="bg-sand-50 rounded-2xl p-3 border border-sand-200/80 mb-4">
+              <span class="text-[10px] font-black uppercase text-terracotta-600 block mb-0.5">${sermon.anchorVerse}</span>
+              <p class="font-serif italic text-xs text-stone-800 line-clamp-2 leading-relaxed">
+                "${sermon.anchorText}"
+              </p>
+            </div>
+
+            <!-- Core Thesis Preview -->
+            <p class="text-xs text-stone-600 line-clamp-3 leading-relaxed mb-4">
+              ${sermon.coreThesis}
+            </p>
+
+            <!-- Tags -->
+            <div class="flex flex-wrap gap-1.5">
+              ${sermon.tags.slice(0, 3).map(tag => `
+                <span class="px-2 py-0.5 rounded-md text-[10px] font-medium bg-sand-100 text-stone-600">
+                  #${tag}
+                </span>
+              `).join('')}
+            </div>
+          </div>
+
+          <!-- Bottom Action Bar -->
+          <div class="px-6 py-4 bg-sand-50/70 border-t border-sand-200 flex items-center justify-between text-xs font-bold text-forest-900 group-hover:bg-forest-900 group-hover:text-sand-50 transition-colors">
+            <span class="flex items-center gap-1.5">
+              <i data-lucide="layers" class="w-4 h-4 text-terracotta-500"></i>
+              Ver Infografía & Apuntes
+            </span>
+            <i data-lucide="arrow-right" class="w-4 h-4 transform group-hover:translate-x-1 transition-transform"></i>
+          </div>
+        `;
+
+        grid.appendChild(card);
+      });
+
+      lucide.createIcons();
+    }
+
+    // Filter Sermons Function
+    function filterSermons() {
+      const search = document.getElementById('search-input').value.toLowerCase().trim();
+      const preacher = document.getElementById('filter-preacher').value;
+      const category = document.getElementById('filter-category').value;
+      const sort = document.getElementById('filter-sort').value;
+
+      let filtered = sermonDatabase.filter(item => {
+        const matchSearch = 
+          item.title.toLowerCase().includes(search) ||
+          item.coreThesis.toLowerCase().includes(search) ||
+          item.anchorVerse.toLowerCase().includes(search) ||
+          item.preacher.toLowerCase().includes(search) ||
+          item.tags.some(t => t.toLowerCase().includes(search));
+
+        const matchPreacher = preacher === 'ALL' || item.preacher.includes(preacher);
+        const matchCategory = category === 'ALL' || item.category === category;
+
+        return matchSearch && matchPreacher && matchCategory;
+      });
+
+      // Sort
+      if (sort === 'NEWEST') {
+        filtered.sort((a, b) => new Date(b.date) - new Date(a.date));
+      } else {
+        filtered.sort((a, b) => new Date(a.date) - new Date(b.date));
+      }
+
+      renderSermons(filtered);
+    }
+
+    // Set topic tag filter
+    function setTopicTag(tag) {
+      document.getElementById('search-input').value = tag;
+      filterSermons();
+    }
+
+    // Clear all filters
+    function clearAllFilters() {
+      document.getElementById('search-input').value = '';
+      document.getElementById('filter-preacher').value = 'ALL';
+      document.getElementById('filter-category').value = 'ALL';
+      document.getElementById('filter-sort').value = 'NEWEST';
+      filterSermons();
+    }
+
+    // Open Infographic Modal View
+    function openInfographic(sermonId) {
+      const sermon = sermonDatabase.find(s => s.id === sermonId);
+      if (!sermon) return;
+
+      currentOpenSermon = sermon;
+      const modal = document.getElementById('infographic-modal');
+      const content = document.getElementById('modal-content');
+      const ytBtn = document.getElementById('modal-yt-btn');
+      const dateTag = document.getElementById('modal-date-tag');
+
+      ytBtn.href = sermon.youtubeUrl;
+      dateTag.textContent = `${sermon.preacher} · ${sermon.formattedDate}`;
+
+      // Build High-Density Infographic Layout Inside the Canvas Container
+      content.innerHTML = `
+        <!-- Corner Accents -->
+        <div class="absolute top-0 left-0 w-36 h-36 border-t-8 border-l-8 border-forest-800/15 rounded-tl-3xl pointer-events-none"></div>
+        <div class="absolute bottom-0 right-0 w-36 h-36 border-b-8 border-r-8 border-terracotta-500/20 rounded-br-3xl pointer-events-none"></div>
+
+        <!-- Editorial Header Section -->
+        <header class="text-center relative pb-8 border-b-2 border-sand-200">
+          <div class="flex items-center justify-center gap-2 mb-3">
+            <span class="inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full bg-forest-800/10 text-forest-900 text-[11px] font-extrabold uppercase tracking-widest border border-forest-800/20">
+              <i data-lucide="church" class="w-3.5 h-3.5 text-forest-700"></i>
+              El Lugar de Su Presencia · Bogotá
+            </span>
+            <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-terracotta-500/10 text-terracotta-600 text-[11px] font-bold uppercase tracking-wider">
+              <i data-lucide="clock" class="w-3 h-3"></i>
+              ${sermon.duration}
+            </span>
+          </div>
+
+          <h2 class="text-3xl sm:text-5xl md:text-6xl font-black tracking-tight text-forest-950 font-sans uppercase mb-4 leading-[1.08]">
+            ${sermon.title}
+          </h2>
+
+          <div class="flex flex-wrap items-center justify-center gap-x-6 gap-y-2 text-stone-600 text-sm font-medium mb-6">
+            <span class="inline-flex items-center gap-2 font-bold text-forest-900 bg-sand-200/50 px-3 py-1 rounded-lg">
+              <i data-lucide="mic-vocal" class="w-4 h-4 text-terracotta-500"></i>
+              ${sermon.preacher}
+            </span>
+            <span class="text-stone-300 hidden sm:inline">•</span>
+            <span class="inline-flex items-center gap-1.5 text-stone-600">
+              <i data-lucide="calendar" class="w-4 h-4 text-stone-400"></i>
+              ${sermon.formattedDate}
+            </span>
+          </div>
+
+          <!-- Anchor Scripture Box -->
+          <div class="max-w-2xl mx-auto bg-white rounded-2xl p-4 sm:p-5 border border-sand-200 shadow-sm flex items-center gap-4 text-left">
+            <div class="w-12 h-12 rounded-xl bg-forest-800 text-amber-300 flex items-center justify-center shrink-0">
+              <i data-lucide="book-marked" class="w-6 h-6"></i>
+            </div>
+            <div>
+              <span class="text-[11px] font-extrabold uppercase tracking-widest text-terracotta-600">Versículo Ancla Fundamental</span>
+              <p class="font-serif italic text-base sm:text-lg text-ink leading-snug">
+                "${sermon.anchorText}"
+              </p>
+              <span class="text-xs font-bold text-forest-800 tracking-wide">— ${sermon.anchorVerse}</span>
+            </div>
+          </div>
+        </header>
+
+        <!-- La Gran Idea (Core Thesis Focal Banner) -->
+        <section class="my-8">
+          <div class="bg-gradient-to-br from-forest-800 via-forest-900 to-forest-950 text-sand-50 rounded-3xl p-6 sm:p-8 shadow-xl relative overflow-hidden border border-forest-700/50">
+            <div class="absolute -right-8 -bottom-8 w-44 h-44 bg-forest-600/30 rounded-full blur-2xl pointer-events-none"></div>
+            <div class="flex items-start gap-5 relative z-10">
+              <div class="p-3.5 bg-amber-400/20 text-amber-300 rounded-2xl backdrop-blur-md shrink-0 border border-amber-400/30 mt-1">
+                <i data-lucide="lightbulb" class="w-7 h-7"></i>
+              </div>
+              <div>
+                <div class="flex items-center gap-2 mb-2">
+                  <span class="px-2.5 py-0.5 rounded-md text-[10px] font-black uppercase tracking-widest bg-terracotta-500 text-white">
+                    Tesis Central del Mensaje
+                  </span>
+                </div>
+                <p class="font-serif text-xl sm:text-2xl md:text-3xl italic leading-snug text-sand-50 mb-3">
+                  "${sermon.coreThesis}"
+                </p>
+                <p class="text-xs sm:text-sm text-sand-200/90 leading-relaxed font-sans max-w-3xl">
+                  ${sermon.thesisDetail}
+                </p>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- Pillars of Wisdom -->
+        <section class="my-10">
+          <div class="flex flex-wrap items-center justify-between gap-3 mb-6 pb-2 border-b border-sand-200">
+            <div>
+              <h3 class="text-xl sm:text-2xl font-black uppercase tracking-tight text-forest-900 flex items-center gap-2.5">
+                <i data-lucide="shield" class="w-6 h-6 text-terracotta-500"></i>
+                Pilares y Principios Clave
+              </h3>
+              <p class="text-xs text-stone-500 mt-0.5 font-medium">Fundamentos innegociables enseñados a través del mensaje</p>
+            </div>
+            <span class="text-xs font-semibold text-stone-600 bg-sand-200/60 px-3 py-1 rounded-full">
+              ${sermon.pillars.length} Claves de Transformación
+            </span>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+            ${sermon.pillars.map(p => `
+              <div class="bg-white rounded-2xl p-5 border border-sand-200 shadow-sm hover:border-forest-700/50 hover:shadow-md transition-all flex flex-col justify-between">
+                <div>
+                  <div class="flex items-center justify-between mb-3">
+                    <span class="w-8 h-8 rounded-xl bg-forest-800 text-sand-50 font-bold flex items-center justify-center text-sm">${p.num}</span>
+                    <span class="text-[11px] font-bold text-terracotta-600 bg-terracotta-400/10 px-2 py-0.5 rounded-md">${p.verse}</span>
+                  </div>
+                  <h4 class="font-bold text-forest-900 text-base mb-2">${p.title}</h4>
+                  <p class="text-stone-600 text-xs sm:text-sm leading-relaxed mb-3">
+                    ${p.desc}
+                  </p>
+                </div>
+                <div class="pt-3 border-t border-sand-100 flex items-center gap-2 text-xs text-forest-800 font-semibold">
+                  <i data-lucide="check-circle-2" class="w-3.5 h-3.5 text-terracotta-500"></i>
+                  <span>${p.highlight}</span>
+                </div>
+              </div>
+            `).join('')}
+          </div>
+        </section>
+
+        <!-- Anecdotes and Real Stories (if any) -->
+        ${sermon.anecdotes && sermon.anecdotes.length > 0 ? `
+          <section class="my-10 bg-sand-50/80 rounded-3xl p-6 sm:p-8 border border-sand-200">
+            <div class="flex items-center gap-3 mb-6 pb-2 border-b border-sand-200">
+              <div class="w-10 h-10 rounded-xl bg-terracotta-500 text-white flex items-center justify-center shadow-sm">
+                <i data-lucide="message-square-quote" class="w-5 h-5"></i>
+              </div>
+              <div>
+                <h3 class="text-xl sm:text-2xl font-black uppercase tracking-tight text-forest-950">
+                  Historias, Anécdotas & Lecciones Reales
+                </h3>
+                <p class="text-xs text-stone-500">Ilustraciones vividas por el orador contadas en la prédica</p>
+              </div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              ${sermon.anecdotes.map(a => `
+                <div class="bg-white p-4.5 rounded-2xl border border-sand-200/90 shadow-sm flex flex-col justify-between">
+                  <div>
+                    <div class="flex items-center gap-2 mb-2 text-terracotta-600">
+                      <i data-lucide="${a.icon}" class="w-4 h-4"></i>
+                      <span class="text-xs font-bold uppercase tracking-wider">${a.title}</span>
+                    </div>
+                    <p class="text-xs sm:text-sm text-stone-700 leading-relaxed">
+                      ${a.text}
+                    </p>
+                  </div>
+                  <span class="mt-3 text-[11px] font-semibold text-stone-600 italic">"${a.quote}"</span>
+                </div>
+              `).join('')}
+            </div>
+          </section>
+        ` : ''}
+
+        <!-- Master Scripture Grid -->
+        <section class="my-10">
+          <div class="flex items-center justify-between mb-5 pb-2 border-b border-sand-200">
+            <div>
+              <h3 class="text-xl sm:text-2xl font-black uppercase tracking-tight text-forest-900 flex items-center gap-2">
+                <i data-lucide="book-open" class="w-6 h-6 text-terracotta-500"></i>
+                Biblioteca Bíblica de la Enseñanza
+              </h3>
+              <p class="text-xs text-stone-500">Todos los pasajes citados y su aplicación práctica</p>
+            </div>
+            <span class="text-xs font-bold text-forest-800 bg-sand-200/60 px-3 py-1 rounded-full">
+              ${sermon.scriptures.length} Pasajes Clave
+            </span>
+          </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3.5">
+            ${sermon.scriptures.map(s => `
+              <div class="p-4 rounded-xl bg-white border border-sand-200 shadow-sm">
+                <div class="flex items-center justify-between mb-1">
+                  <span class="font-bold text-forest-900 text-sm">${s.verse}</span>
+                  <span class="text-[10px] uppercase font-bold text-stone-500">${s.tag}</span>
+                </div>
+                <p class="text-xs text-stone-600">${s.desc}</p>
+              </div>
+            `).join('')}
+          </div>
+        </section>
+
+        <!-- Punchlines Section -->
+        ${sermon.punchlines && sermon.punchlines.length > 0 ? `
+          <section class="my-8 grid grid-cols-1 md:grid-cols-2 gap-4">
+            ${sermon.punchlines.map(punch => `
+              <div class="bg-forest-900 text-sand-50 rounded-2xl p-6 border-l-4 border-terracotta-500 relative overflow-hidden">
+                <i data-lucide="quote" class="w-8 h-8 text-forest-700/60 absolute top-4 right-4"></i>
+                <span class="text-[11px] font-black uppercase tracking-widest text-terracotta-400 block mb-2">${punch.title}</span>
+                <p class="font-serif italic text-base sm:text-lg text-sand-100 leading-relaxed">
+                  "${punch.text}"
+                </p>
+              </div>
+            `).join('')}
+          </section>
+        ` : ''}
+
+        <!-- Interactive Weekly Action Checklist -->
+        <section class="my-10 bg-white rounded-3xl p-6 sm:p-8 border border-sand-300 shadow-md">
+          <div class="flex items-center justify-between mb-4 pb-2 border-b border-sand-200">
+            <div>
+              <h3 class="text-lg sm:text-xl font-black uppercase tracking-tight text-forest-950 flex items-center gap-2">
+                <i data-lucide="check-square" class="w-5 h-5 text-terracotta-500"></i>
+                Ruta de Acción Semanal (Checklist de Estudio)
+              </h3>
+              <p class="text-xs text-stone-500">Toca cada casilla para marcar tus pasos de compromiso</p>
+            </div>
+            <span id="modal-checklist-count" class="text-xs font-bold px-3 py-1 bg-sand-100 text-forest-800 rounded-full">
+              0 de ${sermon.checklist.length} listos
+            </span>
+          </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5 pt-2">
+            ${sermon.checklist.map(item => `
+              <label class="flex items-start gap-3 p-3.5 rounded-2xl bg-sand-50/70 border border-sand-200 hover:border-forest-700/50 cursor-pointer transition-all">
+                <input type="checkbox" onchange="updateModalChecklist(this)" class="mt-1 rounded text-forest-800 focus:ring-forest-800 h-4 w-4 border-stone-300">
+                <div class="text-xs sm:text-sm">
+                  <strong class="text-forest-950 font-bold block">${item.title}</strong>
+                  <span class="text-stone-600">${item.text}</span>
+                </div>
+              </label>
+            `).join('')}
+          </div>
+        </section>
+
+        <!-- Prominent YouTube Banner -->
+        <section class="my-8">
+          <a href="${sermon.youtubeUrl}" target="_blank" rel="noopener noreferrer" class="group block bg-gradient-to-r from-red-700 via-red-600 to-amber-700 text-white rounded-3xl p-6 sm:p-7 shadow-xl hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-1">
+            <div class="flex flex-col sm:flex-row items-center justify-between gap-4">
+              <div class="flex items-center gap-4 text-center sm:text-left">
+                <div class="w-16 h-16 rounded-2xl bg-white text-red-600 flex items-center justify-center shrink-0 shadow-lg group-hover:scale-110 transition-transform">
+                  <i data-lucide="youtube" class="w-9 h-9"></i>
+                </div>
+                <div>
+                  <span class="inline-block text-[10px] font-black uppercase tracking-widest bg-black/30 px-2.5 py-0.5 rounded-md text-amber-200 mb-1">
+                    Servicio Completo Oficial
+                  </span>
+                  <h3 class="text-lg sm:text-2xl font-bold font-sans">
+                    Ver prédica completa en el canal de Su Presencia
+                  </h3>
+                  <p class="text-xs sm:text-sm text-red-100 font-medium">
+                    ${sermon.youtubeUrl} • Duración: ${sermon.duration}
+                  </p>
+                </div>
+              </div>
+
+              <div class="inline-flex items-center gap-2 px-5 py-3 rounded-xl bg-white text-stone-900 font-bold text-xs sm:text-sm shadow-md group-hover:bg-sand-50 transition-colors shrink-0">
+                <span>Reproducir Video</span>
+                <i data-lucide="external-link" class="w-4 h-4 text-red-600"></i>
+              </div>
+            </div>
+          </a>
+        </section>
+
+        <!-- Footer -->
+        <footer class="pt-6 border-t-2 border-sand-200 flex flex-wrap items-center justify-between gap-3 text-xs text-stone-500">
+          <div class="flex items-center gap-2">
+            <span class="w-2.5 h-2.5 rounded-full bg-emerald-600"></span>
+            <span class="font-medium">Material generado bajo la estructura de la Skill <strong class="text-forest-900">su-presencia</strong></span>
+          </div>
+          <div class="font-mono text-[11px] text-stone-600 font-semibold">
+            El Lugar de Su Presencia · Bogotá © 2026
+          </div>
+        </footer>
+      `;
+
+      modal.classList.remove('hidden');
+      document.body.classList.add('overflow-hidden');
+      lucide.createIcons();
+    }
+
+    // Close Modal View
+    function closeModal() {
+      const modal = document.getElementById('infographic-modal');
+      modal.classList.add('hidden');
+      document.body.classList.remove('overflow-hidden');
+    }
+
+    // Update Checklist inside modal
+    function updateModalChecklist(input) {
+      const parentLabel = input.closest('label');
+      if (input.checked) {
+        parentLabel.classList.add('bg-emerald-50/70', 'border-emerald-300');
+        parentLabel.classList.remove('bg-sand-50/70');
+      } else {
+        parentLabel.classList.remove('bg-emerald-50/70', 'border-emerald-300');
+        parentLabel.classList.add('bg-sand-50/70');
+      }
+
+      const checkboxes = document.querySelectorAll('#modal-content input[type="checkbox"]');
+      const checked = document.querySelectorAll('#modal-content input[type="checkbox"]:checked').length;
+      const indicator = document.getElementById('modal-checklist-count');
+      indicator.textContent = `${checked} de ${checkboxes.length} listos`;
+
+      if (checked === checkboxes.length) {
+        showToast("¡Enhorabuena! Has completado todos los compromisos del estudio.");
+      }
+    }
+
+    // High resolution PNG download
+    function downloadCurrentPNG() {
+      if (!currentOpenSermon) return;
+      showToast("Generando lámina en alta resolución...");
+      
+      const element = document.getElementById('modal-content');
+      html2canvas(element, {
+        scale: 2.2,
+        backgroundColor: '#FCFAF6',
+        useCORS: true,
+        logging: false,
+        windowWidth: 1200
+      }).then(canvas => {
+        const link = document.createElement('a');
+        const filename = `infografia_${currentOpenSermon.id}.png`;
+        link.download = filename;
+        link.href = canvas.toDataURL('image/png');
+        link.click();
+        showToast("¡Imagen descargada exitosamente!");
+      }).catch(err => {
+        console.error(err);
+        showToast("Error al exportar. Puedes usar Imprimir / PDF.");
+      });
+    }
+
+    // Toast Notification helper
+    function showToast(message) {
+      const toast = document.getElementById('toast');
+      const text = document.getElementById('toast-text');
+      text.textContent = message;
+      toast.classList.remove('-translate-y-24', 'opacity-0');
+      toast.classList.add('translate-y-0', 'opacity-100');
+
+      setTimeout(() => {
+        toast.classList.remove('translate-y-0', 'opacity-100');
+        toast.classList.add('-translate-y-24', 'opacity-0');
+      }, 3500);
+    }
+
+    // Add New Sermon Modal Functions
+    function openNewSermonModal() {
+      document.getElementById('new-sermon-modal').classList.remove('hidden');
+    }
+
+    function closeNewSermonModal() {
+      document.getElementById('new-sermon-modal').classList.add('hidden');
+    }
+
+    function handleNewSermon(e) {
+      e.preventDefault();
+      const title = document.getElementById('add-title').value;
+      const preacher = document.getElementById('add-preacher').value;
+      const dateVal = document.getElementById('add-date').value;
+      const scripture = document.getElementById('add-scripture').value;
+      const category = document.getElementById('add-category').value;
+      const url = document.getElementById('add-url').value;
+      const idea = document.getElementById('add-idea').value;
+
+      const newSermon = {
+        id: "predica-" + Date.now(),
+        title: title,
+        preacher: preacher,
+        date: dateVal,
+        formattedDate: dateVal,
+        duration: "40 Minutos",
+        category: category,
+        tags: [category, "Estudio", "Su Presencia"],
+        youtubeUrl: url,
+        anchorVerse: scripture,
+        anchorText: "Palabra de Dios viva y eficaz para la edificación del creyente.",
+        coreThesis: idea,
+        thesisDetail: "Enseñanza extraída y catalogada con la skill su-presencia para estudio personal y grupos de conexión.",
+        pillars: [
+          { num: 1, verse: scripture, title: "Fundamento Bíblico", desc: "La base espiritual sobre la cual descansa toda la enseñanza expuesta.", highlight: "Firmeza en la Palabra" },
+          { num: 2, verse: "Santiago 1:22", title: "Hacedores de la Palabra", desc: "No conformarse con ser oidores olvidadizos, sino poner en práctica la verdad.", highlight: "Aplicación diaria" },
+          { num: 3, verse: "Salmo 119:105", title: "Lámpara a mis Pies", desc: "La instrucción de Dios alumbra las decisiones laborales y familiares.", highlight: "Dirección divina" }
+        ],
+        anecdotes: [],
+        scriptures: [
+          { verse: scripture, tag: "Versículo Clave", desc: "Pasaje central impartido en el púlpito." }
+        ],
+        punchlines: [
+          { title: "Declaración Central", text: idea }
+        ],
+        checklist: [
+          { title: "1. Repaso Bíblico", text: "Meditar nuevamente en el versículo ancla durante la semana." },
+          { title: "2. Acción Concreta", text: "Implementar un cambio visible en el hogar o trabajo derivado del mensaje." }
+        ]
+      };
+
+      sermonDatabase.unshift(newSermon);
+      localStorage.setItem(SERMONS_LOCAL_KEY, JSON.stringify(sermonDatabase));
+      updateStatistics();
+      filterSermons();
+      closeNewSermonModal();
+      document.getElementById('new-sermon-form').reset();
+      showToast("¡Prédica agregada a la biblioteca!");
+      openInfographic(newSermon.id);
+    }
+  </script>
+
+</body>
+</html>
