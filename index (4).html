@@ -1,0 +1,862 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Biblioteca de Prédicas & Infografías | El Lugar de Su Presencia</title>
+  
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  
+  <!-- Google Fonts: Cinzel y Plus Jakarta Sans -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;600;700;800&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  
+  <!-- Iconos Lucide y html2canvas para exportar imagen -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+
+  <style>
+    body {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      background-color: #FAF8F5;
+      color: #1F2421;
+    }
+    .font-serif-title {
+      font-family: 'Cinzel', serif;
+    }
+    .line-clamp-2 {
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+    .line-clamp-3 {
+      display: -webkit-box;
+      -webkit-line-clamp: 3;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+    @media print {
+      body * {
+        visibility: hidden;
+      }
+      #infographic-modal, #infographic-modal * {
+        visibility: visible;
+      }
+      #infographic-modal {
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 100%;
+        background: white !important;
+        padding: 0 !important;
+      }
+      .no-print {
+        display: none !important;
+      }
+    }
+  </style>
+</head>
+<body class="min-h-screen flex flex-col antialiased selection:bg-[#2D5A27]/20 selection:text-[#183615]">
+
+  <!-- NAVEGACIÓN PRINCIPAL -->
+  <header class="sticky top-0 z-40 bg-[#FAF8F5]/95 backdrop-blur-md border-b border-[#E3DCD2]">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
+      <div class="flex items-center space-x-3">
+        <div class="w-11 h-11 rounded-2xl bg-[#1D3528] text-white flex items-center justify-center shadow-md">
+          <i data-lucide="book-open" class="w-6 h-6"></i>
+        </div>
+        <div>
+          <span class="text-[10px] sm:text-xs uppercase tracking-[0.25em] font-bold text-[#A85138] block">El Lugar de Su Presencia</span>
+          <h1 class="font-serif-title font-bold text-lg sm:text-2xl text-[#1D3528] tracking-tight">Biblioteca & Infografías</h1>
+        </div>
+      </div>
+
+      <div class="flex items-center space-x-2 sm:space-x-3">
+        <!-- Indicador de conexión con Google Sheets -->
+        <div id="sheet-status-badge" class="hidden sm:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium bg-emerald-50 text-emerald-800 border border-emerald-200/80 shadow-sm">
+          <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+          <span id="sheet-status-text">Conectando Sheets...</span>
+        </div>
+
+        <!-- Botón de recarga/sincronización manual -->
+        <button 
+          onclick="loadDataFromSheet(true)" 
+          title="Sincronizar con Google Sheets"
+          class="inline-flex items-center space-x-1.5 text-xs font-semibold px-3 py-2 rounded-xl bg-white border border-[#DDD5C7] text-stone-700 hover:text-[#1D3528] hover:border-[#1D3528]/30 transition shadow-sm"
+        >
+          <i data-lucide="refresh-cw" id="sync-icon" class="w-3.5 h-3.5"></i>
+          <span class="hidden md:inline">Sincronizar</span>
+        </button>
+
+        <a 
+          href="https://www.youtube.com/@supresencia" 
+          target="_blank" 
+          class="inline-flex items-center space-x-2 text-xs font-semibold px-3.5 py-2 rounded-xl bg-white border border-[#DDD5C7] text-stone-700 hover:text-[#CC0000] hover:border-red-200 transition shadow-sm"
+        >
+          <i data-lucide="youtube" class="w-4 h-4 text-red-600"></i>
+          <span class="hidden sm:inline">YouTube</span>
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <!-- SECCIÓN DE BÚSQUEDA Y FILTROS -->
+  <section class="bg-gradient-to-b from-[#FAF8F5] via-[#F2EDE4] to-[#FAF8F5] py-10 border-b border-[#E3DCD2]/60">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="max-w-3xl mb-8">
+        <p class="text-xs sm:text-sm font-semibold text-[#A85138] tracking-widest uppercase mb-2">Infografías & Apuntes de Estudio</p>
+        <h2 class="font-serif-title text-2xl sm:text-4xl text-[#1D3528] font-bold leading-tight">
+          Explora los apuntes, versículos y sabiduría de cada mensaje y servicio.
+        </h2>
+        <p class="text-xs sm:text-sm text-stone-600 mt-2">
+          Haz clic en cualquier prédica para abrir su infografía completa con pilares, anécdotas, versículos y checklist semanal para exportar o imprimir.
+        </p>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-12 gap-4">
+        <div class="md:col-span-6 relative">
+          <i data-lucide="search" class="w-5 h-5 absolute left-4 top-3.5 text-stone-400"></i>
+          <input 
+            type="text" 
+            id="search-input"
+            placeholder="Buscar por tema, versículo, anécdota, palabra clave o título..."
+            class="w-full pl-12 pr-4 py-3.5 bg-white border border-[#DDD5C7] rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#1D3528]/20 focus:border-[#1D3528] shadow-sm transition"
+          >
+        </div>
+
+        <div class="md:col-span-3">
+          <select 
+            id="preacher-filter"
+            class="w-full py-3.5 px-4 bg-white border border-[#DDD5C7] rounded-xl text-sm text-stone-700 focus:outline-none focus:ring-2 focus:ring-[#1D3528]/20 focus:border-[#1D3528] shadow-sm transition"
+          >
+            <option value="">Todos los predicadores</option>
+            <option value="Andrés Corson">Pastor Andrés Corson</option>
+            <option value="Rocío Corson">Pastora Rocío Corson</option>
+            <option value="Henry Pabón">Pastor Henry Pabón</option>
+          </select>
+        </div>
+
+        <div class="md:col-span-3">
+          <select 
+            id="series-filter"
+            class="w-full py-3.5 px-4 bg-white border border-[#DDD5C7] rounded-xl text-sm text-stone-700 focus:outline-none focus:ring-2 focus:ring-[#1D3528]/20 focus:border-[#1D3528] shadow-sm transition"
+          >
+            <option value="">Todas las series</option>
+            <option value="Finanzas">Finanzas del Reino</option>
+            <option value="Legado">Legado & Familia</option>
+          </select>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CATÁLOGO -->
+  <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 flex-grow">
+    <div id="loading-spinner" class="py-16 text-center text-stone-500 hidden">
+      <i data-lucide="loader" class="w-8 h-8 animate-spin mx-auto text-[#1D3528] mb-3"></i>
+      <p class="text-sm font-medium">Sincronizando con Google Sheets...</p>
+    </div>
+
+    <div id="sermons-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      <!-- Se inyectan las tarjetas dinámicamente -->
+    </div>
+
+    <div id="empty-state" class="hidden py-16 text-center">
+      <div class="w-16 h-16 rounded-full bg-stone-100 flex items-center justify-center mx-auto text-stone-400 mb-4">
+        <i data-lucide="search-x" class="w-8 h-8"></i>
+      </div>
+      <h3 class="font-serif-title text-xl text-stone-700 font-bold mb-1">No se encontraron mensajes</h3>
+      <p class="text-sm text-stone-500">Prueba con otros términos de búsqueda o selecciona otros filtros.</p>
+    </div>
+  </main>
+
+  <!-- MODAL DE LA INFOGRAFÍA -->
+  <div id="infographic-modal" class="fixed inset-0 z-50 bg-black/75 backdrop-blur-sm hidden overflow-y-auto p-3 sm:p-6 lg:p-10">
+    <div class="max-w-5xl mx-auto bg-[#FAF8F5] rounded-3xl shadow-2xl border border-[#E3DCD2] overflow-hidden my-4 sm:my-6">
+      
+      <!-- Barra superior de acciones del modal -->
+      <div class="sticky top-0 z-30 bg-[#FAF8F5]/95 backdrop-blur border-b border-[#E3DCD2] px-4 sm:px-8 py-4 flex items-center justify-between no-print">
+        <button id="close-modal" class="inline-flex items-center space-x-2 text-xs sm:text-sm font-bold text-stone-600 hover:text-[#1D3528] transition">
+          <i data-lucide="arrow-left" class="w-4 h-4"></i>
+          <span>Volver a la Biblioteca</span>
+        </button>
+
+        <div class="flex items-center space-x-2 sm:space-x-3">
+          <button id="download-png-btn" class="px-3.5 sm:px-4 py-2 bg-[#1D3528] text-white rounded-xl text-xs sm:text-sm font-semibold hover:bg-[#14261d] transition flex items-center space-x-2 shadow-sm">
+            <i data-lucide="download" class="w-4 h-4"></i>
+            <span>Exportar PNG</span>
+          </button>
+          <button onclick="window.print()" class="px-3.5 sm:px-4 py-2 bg-white border border-[#DDD5C7] text-stone-700 rounded-xl text-xs sm:text-sm font-semibold hover:bg-stone-50 transition flex items-center space-x-2">
+            <i data-lucide="printer" class="w-4 h-4"></i>
+            <span>Imprimir</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Área visible de renderizado de la infografía -->
+      <div id="infographic-render-area" class="p-6 sm:p-10 lg:p-14 space-y-10 bg-[#FAF8F5]">
+        <!-- Inyectado por openInfographic(sermon) -->
+      </div>
+    </div>
+  </div>
+
+  <footer class="border-t border-[#E3DCD2] py-8 text-center text-xs text-stone-500 bg-[#FAF8F5]">
+    <p>El Lugar de Su Presencia • Biblioteca & Infografías de Estudio Congregacional</p>
+  </footer>
+
+  <script>
+    // ==========================================
+    // CONFIGURACIÓN DE CONEXIÓN A GOOGLE SHEETS
+    // ==========================================
+    // ID de la hoja de cálculo 'Prédicas Su Presencia - Base de Datos'
+    const GOOGLE_SHEET_ID = "1BttD-kCbaqcGBauX5Z7oBJqRzWwf-4KuO01DAN5C1NA";
+    
+    // Endpoint directo mediante Google Visualization API (devuelve JSON seguro sin romper las comillas ni comas de los arreglos JSON)
+    const GOOGLE_SHEET_JSON_URL = `https://docs.google.com/spreadsheets/d/${GOOGLE_SHEET_ID}/gviz/tq?tqx=out:json`;
+
+    // DATOS DE RESPALDO LOCAL (Si no hay internet o se abre como archivo local sin servidor)
+    const DEFAULT_SERMONS = [
+      {
+        id: "1",
+        title: "¿Cómo vivir en escasez para tener abundancia?",
+        preacher: "Andrés Corson",
+        date: "10 Mayo 2026",
+        series: "Finanzas del Reino",
+        videoUrl: "https://www.youtube.com/watch?v=yVGzJHknqgI",
+        anchorScripture: "Proverbios 13:11",
+        bigIdea: "No puedes tener verdadera abundancia si primero no dominas el arte de vivir contento en la escasez.",
+        pillars: [
+          { title: "1. Contentamiento Real", desc: "La verdadera riqueza no añade tristeza. Deja de aparentar un nivel de vida que te mantiene ahogado en deudas.", icon: "scale", ref: "Filipenses 4:12" },
+          { title: "2. Despierta al León", desc: "La necesidad despierta el ingenio y el carácter. Enseña a tus hijos el valor del esfuerzo y a hacer más con menos.", icon: "flame", ref: "1 Samuel 17:34-36" },
+          { title: "3. Rompe la Trampa", desc: "No existe la deuda buena. No normalices deber dinero ni comprometas tu libertad con créditos asfixiantes.", icon: "lock", ref: "2 Reyes 4:1" },
+          { title: "4. Mente de Hormiga", desc: "Guarda en el verano para tener en el invierno. Ahorra hasta el 50% antes de asumir compromisos mayores.", icon: "package", ref: "Proverbios 6:6-8" },
+          { title: "5. Prioriza tu Paz", desc: "Cuando estás endeudado vende lo que tengas. Es mejor perder en un negocio que ser esclavo del acreedor.", icon: "shield", ref: "Salmo 124:7" },
+          { title: "6. Fidelidad en lo Poco", desc: "La abundancia de Su Presencia hoy es fruto de 15 años de vivir en escasez y ser íntegros con Dios.", icon: "sparkles", ref: "Mateo 25:23" }
+        ],
+        anecdotes: [
+          { title: "Caminar a pie en Funza", desc: "8 años sin carro caminando kilómetros al paradero y a la iglesia. Eso ahorró pasajes y gastos médicos." },
+          { title: "La cuenta de $39.000 en limonadas", desc: "Gente endeudada que pide domicilios o bebidas caras en restaurantes sin tener con qué pagarlas." },
+          { title: "Escribiendo a máquina a los 13 años", desc: "Traducía cartas de niños apadrinados. Ahí entendió lo difícil que es ganar un peso y compró sus primeras cosas." },
+          { title: "Bafles caseros en la calle 9ª con 19", desc: "Sin presupuesto para sonido, armó bafles con madera y bocinas de segunda en el centro de Bogotá." },
+          { title: "Micrófonos en la luna de miel", desc: "En vez de toallas o lujos, trajo micrófonos y un mezclador para el inicio de la iglesia." },
+          { title: "La trampa del crédito en 1995", desc: "Compró un apartamento por impulso y la deuda subió de 35 a 42 millones. Vendió carro y apartamento para ser libre." }
+        ],
+        scriptures: [
+          { ref: "Filipenses 4:12", desc: "Pablo aprendió a vivir saciado y a tener hambre; el contentamiento no depende de las circunstancias externas." },
+          { ref: "Proverbios 10:22", desc: "La bendición de Dios es la que enriquece y no añade tristeza." },
+          { ref: "Romanos 8:28", desc: "Dios usa todas las cosas, incluso las temporadas de escasez, para formar nuestro bien." },
+          { ref: "Génesis 14:23", desc: "Abraham rechazó el dinero del rey de Sodoma para que nadie dijera jamás que enriqueció al siervo de Dios." },
+          { ref: "Proverbios 10:4", desc: "La mano diligente enriquece y abre puertas delante de reyes." },
+          { ref: "1 Samuel 17:34-36", desc: "David enfrentó al león y al oso en el desierto; la dificultad despierta al guerrero interior." },
+          { ref: "Proverbios 6:6-8", desc: "Mira la hormiga: sin capitán ni gobernador, recoge su sustento en el verano para el invierno." },
+          { ref: "2 Reyes 4:1-7", desc: "El acreedor venía por los hijos de la viuda. La orden profética fue radical: paga primero tus deudas." },
+          { ref: "Salmo 124:7", desc: "Nuestra alma escapó cual ave del lazo de los cazadores; el lazo se rompió y fuimos libres." },
+          { ref: "Mateo 25:23", desc: "En lo poco has sido fiel, sobre mucho te pondré; entra en el gozo de tu señor." }
+        ],
+        checklist: [
+          "Auditoría inmediata de deudas bancarias y solicitud de tablas de amortización reales.",
+          "Corte radical de gastos hormiga, salidas a restaurantes y compras impulsivas.",
+          "Venta voluntaria de activos no esenciales para amortizar y liquidar acreedores.",
+          "Establecer meta de ahorro mensual sistemático antes de asumir nuevos compromisos."
+        ],
+        quote: "Así como el sexo solo se disfruta en el matrimonio, la vida solo se disfruta plenamente cuando no tienes ni una sola deuda.",
+        tags: ["Finanzas", "Libertad", "Ahorro", "Disciplina", "Fe"]
+      },
+      {
+        id: "2",
+        title: "El legado es más que la herencia",
+        preacher: "Andrés Corson",
+        date: "4 Octubre 2026",
+        series: "Legado & Familia",
+        videoUrl: "https://www.youtube.com/watch?v=GxEKWjGsQcc",
+        anchorScripture: "Lucas 15:11-24",
+        bigIdea: "La herencia es el patrimonio material que dejamos a los hijos; el legado son los principios espirituales y valores que dejamos en ellos.",
+        pillars: [
+          { title: "1. La Trampa de la Herencia", desc: "El hijo pródigo malgastó la herencia en una marranera. Los bienes sin madurez espiritual solo aceleran la autodestrucción.", icon: "coins", ref: "Lucas 15:11-24" },
+          { title: "2. La Presencia ante Todo", desc: "David no entregó el trono por capricho; buscó quien amara el arca del pacto. La adoración y la unción son el mayor tesoro.", icon: "heart", ref: "Salmo 27:4" },
+          { title: "3. Cuidado con las Alianzas", desc: "Salomón desvió su corazón con amores extranjeros. Unirse a quienes no temen a Dios infecta el propósito y divide reinos.", icon: "shield-alert", ref: "1 Reyes 11:1-11" },
+          { title: "4. Honra tu Herencia Espiritual", desc: "No tomes partido con el diablo ni hables mal de la iglesia ni de tus padres. Dios guarda pacto con quienes honran a sus progenitores.", icon: "flame", ref: "2 Crónicas 21:7" },
+          { title: "5. Negación y Sacrificio", desc: "El llamado no es fama ni comodidades en tarima; es orar de madrugada, dejar comodidades y pagar el precio por las almas.", icon: "activity", ref: "Mateo 16:24" },
+          { title: "6. Oír y Obedecer al Instante", desc: "Afinar el oído cada mañana y obedecer sin cuestionar. La fe no se fundamenta en recursos visibles sino en la orden divina.", icon: "volume-2", ref: "Juan 10:27" }
+        ],
+        anecdotes: [
+          { title: "Las 12 Vacas y Tierra y Ganado", desc: "Andrés intentó seguir el legado ganadero de su esposa hasta entender que Dios lo había apartado para el sacerdocio espiritual." },
+          { title: "Las 2 Monedas en la Estación de Tren", desc: "Su abuelo dio sus últimas monedas a un hambriento para predicarle; al llegar a pie recibió milagrosamente un cheque por 2.000 libras." },
+          { title: "El Compás sobre Zipaquirá", desc: "Guiado por el Espíritu Santo, su abuelo trazó un radio de 200 km en Cundinamarca y profetizó la llegada de 50 misioneros que Dios cumplió en 8 años." },
+          { title: "Versículos Escritos en las Piedras", desc: "Pioneros que cosechaban solo 3 convertidos al año bajo persecución pintaban versículos en piedras. Su perseverancia abrió la cosecha actual." },
+          { title: "Dejar la Universidad a la Mitad", desc: "Dios le pidió a Andrés salir de su carrera dos veces para estudiar teología en Berea y fundar la iglesia celular Su Presencia." },
+          { title: "El Precio de la Madrugada", desc: "Orar a diario y predicar 8 veces sin vida social no es emoción; es la cruz de quien elige pagar el precio del llamado." }
+        ],
+        scriptures: [
+          { ref: "Lucas 15:17", desc: "En la marranera el hijo pródigo comprendió que los jornaleros tenían comida y volvió por el legado del padre." },
+          { ref: "Hechos 13:22", desc: "Dios halló en David un corazón dispuesto a hacer toda su voluntad por encima de la gloria humana." },
+          { ref: "1 Reyes 3:11", desc: "Salomón pidió sabiduría para guiar al pueblo y Dios le añadió riquezas y honor que no había pedido." },
+          { ref: "Gálatas 6:9", desc: "No nos cansemos de hacer el bien, porque a su tiempo segaremos si no desmayamos." }
+        ],
+        checklist: [
+          "Priorizar la transmisión de valores y fe en mis hijos antes que solo acumular bienes o herencias materiales.",
+          "Renunciar a la crítica contra mis padres o líderes espirituales y honrar la semilla de fe que dejaron.",
+          "Separar un tiempo diario no negociable de oración matutina para afinar el oído al Espíritu Santo.",
+          "Estar dispuesto a sacrificar comodidades o anhelos personales para obedecer el llamado de Dios."
+        ],
+        quote: "Si Jesucristo es Dios y murió por mí, ningún sacrificio es demasiado grande que yo no pueda hacer por Él.",
+        tags: ["Legado", "Herencia", "Familia", "Sacrificio", "Santidad"]
+      }
+    ];
+
+    let sermonsData = [...DEFAULT_SERMONS];
+    let currentSermon = null;
+
+    // ==========================================
+    // CARGA DE DATOS DESDE GOOGLE SHEETS
+    // ==========================================
+    async function loadDataFromSheet(showFeedback = false) {
+      const spinner = document.getElementById('loading-spinner');
+      const syncIcon = document.getElementById('sync-icon');
+      const badge = document.getElementById('sheet-status-badge');
+      const badgeText = document.getElementById('sheet-status-text');
+
+      if (spinner) spinner.classList.remove('hidden');
+      if (syncIcon) syncIcon.classList.add('animate-spin');
+      if (badge) badge.classList.remove('hidden');
+      if (badgeText) badgeText.textContent = "Conectando...";
+
+      try {
+        const response = await fetch(GOOGLE_SHEET_JSON_URL);
+        if (!response.ok) {
+          throw new Error(`HTTP error ${response.status}`);
+        }
+
+        const rawText = await response.text();
+        
+        // Google GViz devuelve: /*O_o*/ google.visualization.Query.setResponse({...});
+        const jsonStart = rawText.indexOf('{');
+        const jsonEnd = rawText.lastIndexOf('}');
+        if (jsonStart === -1 || jsonEnd === -1) {
+          throw new Error('Estructura de respuesta no válida');
+        }
+
+        const payload = JSON.parse(rawText.substring(jsonStart, jsonEnd + 1));
+        const rows = payload.table.rows;
+
+        if (!rows || rows.length === 0) {
+          throw new Error('La hoja no contiene filas de datos');
+        }
+
+        // Mapeo seguro de columnas
+        const loadedSermons = rows.map((row, idx) => {
+          const val = (colIdx) => {
+            if (!row.c || !row.c[colIdx] || row.c[colIdx].v === null || row.c[colIdx].v === undefined) {
+              return '';
+            }
+            return row.c[colIdx].v;
+          };
+
+          // Columnas:
+          // 0: id, 1: title, 2: preacher, 3: date, 4: series, 5: videoUrl,
+          // 6: anchorScripture, 7: bigIdea, 8: pillarsJson, 9: anecdotesJson,
+          // 10: scripturesJson, 11: checklistJson, 12: quote, 13: tags
+          
+          let pillars = [];
+          let anecdotes = [];
+          let scriptures = [];
+          let checklist = [];
+          let tags = [];
+
+          const parseJsonField = (raw) => {
+            if (!raw) return [];
+            if (typeof raw === 'object') return raw;
+            try {
+              return JSON.parse(raw);
+            } catch (e) {
+              return [];
+            }
+          };
+
+          pillars = parseJsonField(val(8));
+          anecdotes = parseJsonField(val(9));
+          scriptures = parseJsonField(val(10));
+          
+          const rawCheck = val(11);
+          if (rawCheck) {
+            if (typeof rawCheck === 'string' && rawCheck.trim().startsWith('[')) {
+              checklist = parseJsonField(rawCheck);
+            } else if (typeof rawCheck === 'string') {
+              checklist = rawCheck.split('\n').map(s => s.trim()).filter(Boolean);
+            }
+          }
+
+          const rawTags = val(13);
+          if (rawTags) {
+            tags = String(rawTags).split(',').map(t => t.trim()).filter(Boolean);
+          }
+
+          return {
+            id: String(val(0) || (idx + 1)),
+            title: String(val(1) || 'Sin título'),
+            preacher: String(val(2) || 'Pastor'),
+            date: String(val(3) || ''),
+            series: String(val(4) || 'General'),
+            videoUrl: String(val(5) || ''),
+            anchorScripture: String(val(6) || ''),
+            bigIdea: String(val(7) || ''),
+            pillars: Array.isArray(pillars) ? pillars : [],
+            anecdotes: Array.isArray(anecdotes) ? anecdotes : [],
+            scriptures: Array.isArray(scriptures) ? scriptures : [],
+            checklist: Array.isArray(checklist) ? checklist : [],
+            quote: String(val(12) || ''),
+            tags: tags
+          };
+        });
+
+        if (loadedSermons.length > 0) {
+          sermonsData = loadedSermons;
+          if (badgeText) badgeText.textContent = `Sheets en vivo (${sermonsData.length} prédicas)`;
+          updateDropdownFilters(sermonsData);
+          applyFilters();
+          if (showFeedback) alert(`¡Sincronizado con éxito! Se cargaron ${loadedSermons.length} prédicas desde Google Sheets.`);
+        }
+      } catch (err) {
+        console.warn("Aviso: Usando datos locales predeterminados.", err);
+        if (badge) {
+          badge.className = "hidden sm:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium bg-amber-50 text-amber-800 border border-amber-200/80 shadow-sm";
+        }
+        if (badgeText) badgeText.textContent = "Datos locales (Offline)";
+        sermonsData = [...DEFAULT_SERMONS];
+        updateDropdownFilters(sermonsData);
+        applyFilters();
+      } finally {
+        if (spinner) spinner.classList.add('hidden');
+        if (syncIcon) syncIcon.classList.remove('animate-spin');
+      }
+    }
+
+    // ==========================================
+    // ACTUALIZAR OPCIONES DE FILTROS DINÁMICOS
+    // ==========================================
+    function updateDropdownFilters(data) {
+      const preacherSelect = document.getElementById('preacher-filter');
+      const seriesSelect = document.getElementById('series-filter');
+
+      const preachers = [...new Set(data.map(s => s.preacher).filter(Boolean))];
+      const seriesList = [...new Set(data.map(s => s.series).filter(Boolean))];
+
+      const currentPreacher = preacherSelect.value;
+      const currentSeries = seriesSelect.value;
+
+      preacherSelect.innerHTML = '<option value="">Todos los predicadores</option>' + 
+        preachers.map(p => `<option value="${p}">${p}</option>`).join('');
+      
+      seriesSelect.innerHTML = '<option value="">Todas las series</option>' + 
+        seriesList.map(s => `<option value="${s}">${s}</option>`).join('');
+
+      if (preachers.includes(currentPreacher)) preacherSelect.value = currentPreacher;
+      if (seriesList.includes(currentSeries)) seriesSelect.value = currentSeries;
+    }
+
+    // ==========================================
+    // FILTRADO Y BÚSQUEDA EN TIEMPO REAL
+    // ==========================================
+    function applyFilters() {
+      const query = document.getElementById('search-input').value.toLowerCase().trim();
+      const preacher = document.getElementById('preacher-filter').value.toLowerCase();
+      const series = document.getElementById('series-filter').value.toLowerCase();
+
+      const filtered = sermonsData.filter(sermon => {
+        const matchesPreacher = !preacher || (sermon.preacher && sermon.preacher.toLowerCase().includes(preacher));
+        const matchesSeries = !series || (sermon.series && sermon.series.toLowerCase().includes(series));
+
+        if (!matchesPreacher || !matchesSeries) return false;
+        if (!query) return true;
+
+        const corpus = [
+          sermon.title,
+          sermon.bigIdea,
+          sermon.anchorScripture,
+          sermon.preacher,
+          sermon.series,
+          sermon.quote,
+          ...(sermon.tags || []),
+          ...(sermon.pillars || []).map(p => `${p.title} ${p.desc} ${p.ref}`),
+          ...(sermon.anecdotes || []).map(a => `${a.title} ${a.desc}`),
+          ...(sermon.scriptures || []).map(s => `${s.ref} ${s.desc}`),
+          ...(sermon.checklist || [])
+        ].join(' ').toLowerCase();
+
+        return corpus.includes(query);
+      });
+
+      renderSermonsGrid(filtered);
+    }
+
+    // ==========================================
+    // RENDERIZADO DEL CATÁLOGO DE TARJETAS
+    // ==========================================
+    function renderSermonsGrid(list) {
+      const grid = document.getElementById('sermons-grid');
+      const empty = document.getElementById('empty-state');
+      if (!grid) return;
+      grid.innerHTML = '';
+
+      if (list.length === 0) {
+        grid.classList.add('hidden');
+        if (empty) empty.classList.remove('hidden');
+        lucide.createIcons();
+        return;
+      }
+
+      if (empty) empty.classList.add('hidden');
+      grid.classList.remove('hidden');
+
+      list.forEach(sermon => {
+        const card = document.createElement('div');
+        card.className = "bg-white border border-[#E3DCD2] rounded-3xl p-6 sm:p-7 shadow-sm hover:shadow-xl transition-all duration-300 flex flex-col justify-between group cursor-pointer hover:border-[#1D3528]/50";
+        card.onclick = () => openInfographic(sermon);
+
+        card.innerHTML = `
+          <div>
+            <!-- Metadatos superiores -->
+            <div class="flex items-center justify-between text-xs text-stone-500 mb-4 pb-3 border-b border-stone-100">
+              <span class="inline-flex items-center gap-1.5 font-bold text-[#A85138]">
+                <i data-lucide="bookmark" class="w-3.5 h-3.5"></i>
+                ${sermon.series}
+              </span>
+              <span class="font-medium">${sermon.date}</span>
+            </div>
+
+            <!-- Título de la prédica -->
+            <h3 class="font-serif-title text-xl font-bold text-[#1D3528] group-hover:text-[#A85138] transition leading-snug mb-3">
+              ${sermon.title}
+            </h3>
+
+            <!-- Predicador y Versículo Ancla -->
+            <div class="flex flex-wrap items-center gap-2 text-xs font-semibold text-stone-600 mb-4">
+              <span class="inline-flex items-center gap-1.5 bg-[#F2EDE4] text-stone-800 px-3 py-1 rounded-lg">
+                <i data-lucide="user" class="w-3.5 h-3.5 text-[#1D3528]"></i>
+                ${sermon.preacher}
+              </span>
+              ${sermon.anchorScripture ? `
+                <span class="inline-flex items-center gap-1.5 bg-amber-50 text-amber-900 border border-amber-200/60 px-3 py-1 rounded-lg">
+                  <i data-lucide="scroll" class="w-3.5 h-3.5 text-amber-700"></i>
+                  ${sermon.anchorScripture}
+                </span>
+              ` : ''}
+            </div>
+
+            <!-- Idea Central -->
+            <p class="text-xs text-stone-600 leading-relaxed mb-5 line-clamp-3">
+              ${sermon.bigIdea}
+            </p>
+
+            <!-- Etiquetas / Tags -->
+            <div class="flex flex-wrap gap-1.5 mb-6">
+              ${(sermon.tags || []).slice(0, 4).map(tag => `
+                <span class="text-[10px] font-semibold bg-stone-100 text-stone-600 px-2.5 py-1 rounded-md">#${tag}</span>
+              `).join('')}
+            </div>
+          </div>
+
+          <!-- Acción inferior -->
+          <div class="pt-4 border-t border-stone-100 flex items-center justify-between text-xs">
+            <span class="font-bold text-[#1D3528] group-hover:translate-x-1 transition-transform inline-flex items-center gap-1.5">
+              Ver Infografía Completa
+              <i data-lucide="arrow-right" class="w-4 h-4"></i>
+            </span>
+            ${sermon.videoUrl ? `
+              <a 
+                href="${sermon.videoUrl}" 
+                target="_blank" 
+                onclick="event.stopPropagation()"
+                title="Ver prédica en YouTube"
+                class="p-2 text-stone-400 hover:text-red-600 hover:bg-red-50 rounded-xl transition"
+              >
+                <i data-lucide="play-circle" class="w-5 h-5"></i>
+              </a>
+            ` : ''}
+          </div>
+        `;
+
+        grid.appendChild(card);
+      });
+
+      lucide.createIcons();
+    }
+
+    // ==========================================
+    // MODAL DE LA INFOGRAFÍA
+    // ==========================================
+    function openInfographic(sermon) {
+      currentSermon = sermon;
+      const modal = document.getElementById('infographic-modal');
+      const container = document.getElementById('infographic-render-area');
+
+      // Generar el diseño editorial de la infografía
+      container.innerHTML = `
+        <!-- CABECERA DE LA INFOGRAFÍA -->
+        <div class="border-b border-[#E3DCD2] pb-8">
+          <div class="flex flex-wrap items-center justify-between gap-3 text-xs font-bold text-[#A85138] uppercase tracking-widest mb-4">
+            <span class="inline-flex items-center gap-2">
+              <i data-lucide="bookmark" class="w-4 h-4"></i>
+              Serie: ${sermon.series}
+            </span>
+            <span class="text-stone-500 font-semibold">${sermon.date}</span>
+          </div>
+
+          <h1 class="font-serif-title text-3xl sm:text-4xl lg:text-5xl font-extrabold text-[#1D3528] leading-tight mb-5">
+            ${sermon.title}
+          </h1>
+
+          <div class="flex flex-wrap items-center gap-3 text-sm">
+            <span class="inline-flex items-center gap-2 bg-[#F2EDE4] text-[#1D3528] font-bold px-4 py-2 rounded-xl">
+              <i data-lucide="user-check" class="w-4 h-4"></i>
+              ${sermon.preacher}
+            </span>
+            ${sermon.anchorScripture ? `
+              <span class="inline-flex items-center gap-2 bg-amber-50 text-amber-900 border border-amber-200 px-4 py-2 rounded-xl font-bold">
+                <i data-lucide="book-marked" class="w-4 h-4 text-amber-700"></i>
+                Versículo Ancla: ${sermon.anchorScripture}
+              </span>
+            ` : ''}
+            ${sermon.videoUrl ? `
+              <a 
+                href="${sermon.videoUrl}" 
+                target="_blank" 
+                class="inline-flex items-center gap-2 text-xs font-bold px-4 py-2 rounded-xl bg-red-50 text-red-700 hover:bg-red-100 transition no-print"
+              >
+                <i data-lucide="youtube" class="w-4 h-4 text-red-600"></i>
+                Ver en YouTube
+              </a>
+            ` : ''}
+          </div>
+        </div>
+
+        <!-- IDEA CENTRAL / BIG IDEA -->
+        <div class="bg-gradient-to-br from-[#1D3528] to-[#12241b] text-white p-6 sm:p-8 rounded-3xl shadow-lg relative overflow-hidden">
+          <div class="absolute -right-6 -bottom-6 text-white/5 pointer-events-none">
+            <i data-lucide="quote" class="w-48 h-48"></i>
+          </div>
+          <div class="relative z-10">
+            <div class="flex items-center gap-2 text-amber-300 text-xs uppercase tracking-widest font-extrabold mb-3">
+              <i data-lucide="sparkles" class="w-4 h-4"></i>
+              Idea Central del Mensaje
+            </div>
+            <p class="font-serif-title text-xl sm:text-2xl font-bold leading-snug text-white/95">
+              "${sermon.bigIdea}"
+            </p>
+          </div>
+        </div>
+
+        <!-- PILARES Y PRINCIPIOS (MÍNIMO 5/6 CLAVES) -->
+        <div>
+          <div class="flex items-center gap-2 mb-6">
+            <div class="w-8 h-8 rounded-xl bg-[#A85138]/10 text-[#A85138] flex items-center justify-center font-bold">
+              <i data-lucide="layers" class="w-4 h-4"></i>
+            </div>
+            <div>
+              <h2 class="font-serif-title text-2xl font-bold text-[#1D3528]">Pilares & Principios Fundamentales</h2>
+              <p class="text-xs text-stone-500">Claves espirituales desarrolladas a lo largo de la prédica</p>
+            </div>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+            ${(sermon.pillars || []).map((p, idx) => `
+              <div class="bg-white border border-[#E3DCD2] rounded-2xl p-5 shadow-sm flex flex-col justify-between hover:border-[#1D3528]/30 transition">
+                <div>
+                  <div class="flex items-center justify-between mb-3">
+                    <span class="w-7 h-7 rounded-lg bg-[#FAF8F5] border border-[#DDD5C7] text-xs font-bold text-[#1D3528] flex items-center justify-center">
+                      ${idx + 1}
+                    </span>
+                    <i data-lucide="${p.icon || 'check-circle'}" class="w-4 h-4 text-[#A85138]"></i>
+                  </div>
+                  <h3 class="font-bold text-sm text-[#1D3528] mb-2">${p.title}</h3>
+                  <p class="text-xs text-stone-600 leading-relaxed mb-4">${p.desc}</p>
+                </div>
+                ${p.ref ? `
+                  <div class="pt-3 border-t border-stone-100 flex items-center gap-1.5 text-[11px] font-bold text-amber-900 bg-amber-50/60 px-2.5 py-1 rounded-lg w-fit">
+                    <i data-lucide="scroll" class="w-3 h-3 text-amber-700"></i>
+                    ${p.ref}
+                  </div>
+                ` : ''}
+              </div>
+            `).join('')}
+          </div>
+        </div>
+
+        <!-- ANÉCDOTAS E ILUSTRACIONES DE VIDA -->
+        ${(sermon.anecdotes && sermon.anecdotes.length > 0) ? `
+          <div class="bg-[#F2EDE4]/70 rounded-3xl p-6 sm:p-8 border border-[#E3DCD2]">
+            <div class="flex items-center gap-2 mb-6">
+              <div class="w-8 h-8 rounded-xl bg-[#1D3528] text-white flex items-center justify-center font-bold">
+                <i data-lucide="message-square" class="w-4 h-4"></i>
+              </div>
+              <div>
+                <h2 class="font-serif-title text-2xl font-bold text-[#1D3528]">Historias & Anécdotas Ilustrativas</h2>
+                <p class="text-xs text-stone-600">Vivencias y testimonios reales compartidos en tarima</p>
+              </div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+              ${sermon.anecdotes.map(a => `
+                <div class="bg-white rounded-2xl p-5 border border-[#DDD5C7] shadow-sm">
+                  <div class="flex items-center gap-2 font-bold text-sm text-[#A85138] mb-2">
+                    <i data-lucide="feather" class="w-3.5 h-3.5 text-[#A85138]"></i>
+                    ${a.title}
+                  </div>
+                  <p class="text-xs text-stone-600 leading-relaxed">${a.desc}</p>
+                </div>
+              `).join('')}
+            </div>
+          </div>
+        ` : ''}
+
+        <!-- CITAS BÍBLICAS & CHECKLIST PRÁCTICO -->
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+          <!-- Columna Citas Bíblicas (7 columnas) -->
+          <div class="lg:col-span-7 space-y-4">
+            <div class="flex items-center gap-2 mb-4">
+              <i data-lucide="book-open" class="w-5 h-5 text-[#1D3528]"></i>
+              <h2 class="font-serif-title text-xl font-bold text-[#1D3528]">Citas Bíblicas de Referencia</h2>
+            </div>
+            
+            <div class="space-y-3">
+              ${(sermon.scriptures || []).map(sc => `
+                <div class="bg-white border border-[#E3DCD2] rounded-2xl p-4 shadow-sm">
+                  <div class="font-bold text-xs text-[#A85138] mb-1 flex items-center gap-1.5">
+                    <i data-lucide="scroll" class="w-3 h-3"></i>
+                    ${sc.ref}
+                  </div>
+                  <p class="text-xs text-stone-600 leading-relaxed">${sc.desc}</p>
+                </div>
+              `).join('')}
+            </div>
+          </div>
+
+          <!-- Columna Checklist de Aplicación Semanal (5 columnas) -->
+          <div class="lg:col-span-5 bg-white border-2 border-[#1D3528]/20 rounded-3xl p-6 sm:p-7 shadow-sm">
+            <div class="flex items-center gap-2 mb-2">
+              <div class="w-7 h-7 rounded-lg bg-emerald-100 text-emerald-800 flex items-center justify-center font-bold">
+                <i data-lucide="check-square" class="w-4 h-4"></i>
+              </div>
+              <h2 class="font-serif-title text-lg font-bold text-[#1D3528]">Desafío & Checklist Semanal</h2>
+            </div>
+            <p class="text-xs text-stone-500 mb-5">Acciones concretas para aplicar en tu vida diaria:</p>
+
+            <div class="space-y-3">
+              ${(sermon.checklist || []).map((item, i) => `
+                <label class="flex items-start gap-3 p-3 rounded-xl bg-[#FAF8F5] border border-[#E3DCD2] cursor-pointer hover:bg-stone-50 transition text-xs text-stone-700 leading-relaxed">
+                  <input type="checkbox" class="mt-0.5 rounded text-[#1D3528] focus:ring-[#1D3528]">
+                  <span>${item}</span>
+                </label>
+              `).join('')}
+            </div>
+          </div>
+        </div>
+
+        <!-- FRASE PARA RECORDAR / QUOTE -->
+        ${sermon.quote ? `
+          <div class="border-l-4 border-[#A85138] bg-[#FAF8F5] p-6 rounded-r-3xl border-t border-r border-b border-[#E3DCD2]">
+            <p class="text-xs uppercase tracking-widest text-[#A85138] font-extrabold mb-2">Declaración Destacada</p>
+            <p class="font-serif-title text-lg sm:text-xl font-bold text-[#1D3528] italic">
+              "${sermon.quote}"
+            </p>
+          </div>
+        ` : ''}
+
+        <!-- PIE DE LA INFOGRAFÍA -->
+        <div class="pt-8 border-t border-[#E3DCD2] flex flex-wrap items-center justify-between gap-4 text-xs text-stone-500">
+          <div class="flex items-center gap-2">
+            <span class="font-bold text-[#1D3528]">El Lugar de Su Presencia</span>
+            <span>•</span>
+            <span>Bogotá, Colombia</span>
+          </div>
+          <div class="flex flex-wrap gap-2">
+            ${(sermon.tags || []).map(t => `<span class="text-[11px] bg-stone-100 text-stone-600 px-2.5 py-1 rounded-md">#${t}</span>`).join('')}
+          </div>
+        </div>
+      `;
+
+      modal.classList.remove('hidden');
+      document.body.style.overflow = 'hidden';
+      lucide.createIcons();
+    }
+
+    function closeModal() {
+      const modal = document.getElementById('infographic-modal');
+      modal.classList.add('hidden');
+      document.body.style.overflow = '';
+      currentSermon = null;
+    }
+
+    // ==========================================
+    // EXPORTACIÓN A PNG CON HTML2CANVAS
+    // ==========================================
+    async function exportInfographicToPng() {
+      if (!currentSermon) return;
+      const renderArea = document.getElementById('infographic-render-area');
+      const btn = document.getElementById('download-png-btn');
+      const originalHtml = btn.innerHTML;
+
+      btn.disabled = true;
+      btn.innerHTML = `<i data-lucide="loader" class="w-4 h-4 animate-spin"></i><span>Generando imagen...</span>`;
+      lucide.createIcons();
+
+      try {
+        const canvas = await html2canvas(renderArea, {
+          scale: 2, // 2x para resolución nítida
+          useCORS: true,
+          backgroundColor: '#FAF8F5',
+          logging: false
+        });
+
+        const safeTitle = (currentSermon.title || 'Infografia')
+          .toLowerCase()
+          .replace(/[^a-z0-9]/g, '_')
+          .substring(0, 40);
+
+        const link = document.createElement('a');
+        link.download = `Infografia_SuPresencia_${safeTitle}.png`;
+        link.href = canvas.toDataURL('image/png');
+        link.click();
+      } catch (err) {
+        console.error('Error al generar PNG:', err);
+        alert('No se pudo generar la imagen automática. Puedes usar el botón de Imprimir para guardarlo como PDF.');
+      } finally {
+        btn.disabled = false;
+        btn.innerHTML = originalHtml;
+        lucide.createIcons();
+      }
+    }
+
+    // ==========================================
+    // EVENT LISTENERS E INICIALIZACIÓN
+    // ==========================================
+    document.addEventListener('DOMContentLoaded', () => {
+      // 1. Cargar biblioteca y conectar a Google Sheets
+      loadDataFromSheet();
+
+      // 2. Buscador y Filtros
+      document.getElementById('search-input').addEventListener('input', applyFilters);
+      document.getElementById('preacher-filter').addEventListener('change', applyFilters);
+      document.getElementById('series-filter').addEventListener('change', applyFilters);
+
+      // 3. Botones del Modal
+      document.getElementById('close-modal').addEventListener('click', closeModal);
+      document.getElementById('download-png-btn').addEventListener('click', exportInfographicToPng);
+
+      // 4. Cerrar con tecla Escape o clic fuera
+      document.getElementById('infographic-modal').addEventListener('click', (e) => {
+        if (e.target.id === 'infographic-modal') closeModal();
+      });
+
+      document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') closeModal();
+      });
+
+      lucide.createIcons();
+    });
+  </script>
+</body>
+</html>
