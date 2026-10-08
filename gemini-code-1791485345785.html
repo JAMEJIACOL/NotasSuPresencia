@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Biblioteca de Prédicas & Apuntes | El Lugar de Su Presencia</title>
+  
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700;800&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+
+  <style>
+    body {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      background-color: #FAF8F5;
+      color: #1F2421;
+    }
+    .font-serif-title {
+      font-family: 'Cinzel', serif;
+    }
+    .line-clamp-2 {
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+  </style>
+</head>
+<body class="min-h-screen flex flex-col antialiased selection:bg-[#2D5A27]/20 selection:text-[#183615]">
+
+  <!-- NAVEGACIÓN PRINCIPAL (MINIMALISTA Y LIMPIA) -->
+  <header class="sticky top-0 z-40 bg-[#FAF8F5]/90 backdrop-blur-md border-b border-[#E3DCD2]">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
+      <div class="flex items-center space-x-3">
+        <div class="w-11 h-11 rounded-2xl bg-[#1D3528] text-white flex items-center justify-center shadow-md">
+          <i data-lucide="book-open" class="w-6 h-6"></i>
+        </div>
+        <div>
+          <span class="text-xs uppercase tracking-[0.25em] font-bold text-[#A85138] block">El Lugar de Su Presencia</span>
+          <h1 class="font-serif-title font-bold text-xl sm:text-2xl text-[#1D3528] tracking-tight">Biblioteca de Prédicas & Apuntes</h1>
+        </div>
+      </div>
+
+      <!-- Enlace directo al canal oficial -->
+      <a 
+        href="https://www.youtube.com/@supresenciabogota" 
+        target="_blank" 
+        class="inline-flex items-center space-x-2 text-xs font-semibold px-4 py-2 rounded-xl bg-white border border-[#DDD5C7] text-stone-700 hover:text-[#CC0000] hover:border-red-200 transition shadow-sm"
+      >
+        <i data-lucide="youtube" class="w-4 h-4 text-red-600"></i>
+        <span class="hidden sm:inline">Canal de YouTube</span>
+      </a>
+    </div>
+  </header>
+
+  <!-- HERO Y HERRAMIENTAS DE BÚSQUEDA -->
+  <section class="bg-gradient-to-b from-[#FAF8F5] via-[#F2EDE4] to-[#FAF8F5] py-10 border-b border-[#E3DCD2]/60">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="max-w-3xl mb-8">
+        <p class="text-sm font-semibold text-[#A85138] tracking-widest uppercase mb-2">Herramienta de Crecimiento Espiritual</p>
+        <h2 class="font-serif-title text-3xl sm:text-4xl text-[#1D3528] font-bold leading-tight">
+          Explora los apuntes, versículos y sabiduría de cada mensaje y servicio.
+        </h2>
+      </div>
+
+      <!-- BUSCADOR Y FILTROS -->
+      <div class="grid grid-cols-1 md:grid-cols-12 gap-4">
+        <div class="md:col-span-6 relative">
+          <i data-lucide="search" class="w-5 h-5 absolute left-4 top-3.5 text-stone-400"></i>
+          <input 
+            type="text" 
+            id="search-input"
+            placeholder="Buscar por tema, versículo, palabra clave o título..."
+            class="w-full pl-12 pr-4 py-3.5 bg-white border border-[#DDD5C7] rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#1D3528]/20 focus:border-[#1D3528] shadow-sm transition"
+          >
+        </div>
+
+        <div class="md:col-span-3">
+          <select 
+            id="preacher-filter"
+            class="w-full py-3.5 px-4 bg-white border border-[#DDD5C7] rounded-xl text-sm text-stone-700 focus:outline-none focus:ring-2 focus:ring-[#1D3528]/20 focus:border-[#1D3528] shadow-sm transition"
+          >
+            <option value="">Todos los predicadores</option>
+            <option value="Andrés Corson">Pastor Andrés Corson</option>
+            <option value="Rocío Corson">Pastora Rocío Corson</option>
+            <option value="Henry Pabón">Pastor Henry Pabón</option>
+          </select>
+        </div>
+
+        <div class="md:col-span-3">
+          <select 
+            id="series-filter"
+            class="w-full py-3.5 px-4 bg-white border border-[#DDD5C7] rounded-xl text-sm text-stone-700 focus:outline-none focus:ring-2 focus:ring-[#1D3528]/20 focus:border-[#1D3528] shadow-sm transition"
+          >
+            <option value="">Todas las series</option>
+            <option value="Finanzas del Reino">Finanzas del Reino</option>
+            <option value="Legado & Familia">Legado & Familia</option>
+            <option value="Vida de Fe">Vida de Fe</option>
+          </select>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CATÁLOGO DE TARJETAS -->
+  <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 flex-grow">
+    <div id="loading-spinner" class="py-20 text-center text-stone-500">
+      <i data-lucide="loader" class="w-8 h-8 animate-spin mx-auto text-[#1D3528] mb-3"></i>
+      <p class="text-sm font-medium">Cargando biblioteca de mensajes...</p>
+    </div>
+
+    <div id="sermons-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 hidden">
+      <!-- Se inyectan las tarjetas de cada prédica -->
+    </div>
+
+    <div id="empty-state" class="hidden py-16 text-center">
+      <div class="w-16 h-16 rounded-full bg-stone-100 flex items-center justify-center mx-auto text-stone-400 mb-4">
+        <i data-lucide="search-x" class="w-8 h-8"></i>
+      </div>
+      <h3 class="font-serif-title text-xl text-stone-700 font-bold mb-1">No se encontraron mensajes</h3>
+      <p class="text-sm text-stone-500">Prueba con otros términos de búsqueda o filtros.</p>
+    </div>
+  </main>
+
+  <!-- MODAL VISOR DE LA INFOGRAFÍA COMPLETA -->
+  <div id="infographic-modal" class="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm hidden overflow-y-auto p-4 sm:p-6 lg:p-10">
+    <div class="max-w-5xl mx-auto bg-[#FAF8F5] rounded-3xl shadow-2xl border border-[#E3DCD2] overflow-hidden my-6">
+      
+      <!-- Barra superior de acciones para el usuario -->
+      <div class="sticky top-0 z-30 bg-[#FAF8F5]/95 backdrop-blur border-b border-[#E3DCD2] px-6 py-4 flex items-center justify-between">
+        <button id="close-modal" class="inline-flex items-center space-x-2 text-sm font-semibold text-stone-600 hover:text-stone-900 transition">
+          <i data-lucide="arrow-left" class="w-4 h-4"></i>
+          <span>Volver a la Biblioteca</span>
+        </button>
+
+        <div class="flex items-center space-x-3">
+          <button id="download-png-btn" class="px-4 py-2 bg-[#1D3528] text-white rounded-xl text-xs sm:text-sm font-semibold hover:bg-[#14261d] transition flex items-center space-x-2 shadow-sm">
+            <i data-lucide="download" class="w-4 h-4"></i>
+            <span>Exportar PNG</span>
+          </button>
+          <button onclick="window.print()" class="px-4 py-2 bg-white border border-[#DDD5C7] text-stone-700 rounded-xl text-xs sm:text-sm font-semibold hover:bg-stone-50 transition flex items-center space-x-2">
+            <i data-lucide="printer" class="w-4 h-4"></i>
+            <span>Imprimir</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Contenedor renderizado de la lámina infográfica -->
+      <div id="infographic-render-area" class="p-6 sm:p-10 lg:p-14 space-y-12 bg-[#FAF8F5]">
+        <!-- Contenido generado dinámicamente -->
+      </div>
+    </div>
+  </div>
+
+  <footer class="border-t border-[#E3DCD2] py-8 text-center text-xs text-stone-500 bg-[#FAF8F5]">
+    <p>El Lugar de Su Presencia • Apuntes y Recursos de Estudio para la Congregación</p>
+  </footer>
+
+  <script>
+    // Enlace directo al CSV publicado en la web de tu Google Sheet
+    const GOOGLE_SHEET_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQ.../pub?output=csv";
+
+    // Prédicas iniciales precargadas
+    const DEFAULT_SERMONS = [
+      {
+        id: "1",
+        title: "¿Cómo vivir en escasez para tener abundancia?",
+        preacher: "Andrés Corson",
+        date: "10 Mayo 2026",
+        series: "Finanzas del Reino",
+        videoUrl: "https://www.youtube.com/watch?v=yVGzJHknqgI",
+        anchorScripture: "Proverbios 13:11",
+        bigIdea: "No puedes tener verdadera abundancia si primero no dominas el arte de vivir contento en la escasez.",
+        pillars: [
+          { title: "1. Contentamiento Real", desc: "La verdadera riqueza no añade tristeza. Deja de aparentar un nivel de vida que te mantiene ahogado en deudas.", icon: "scale", ref: "Filipenses 4:12" },
+          { title: "2. Despierta al León", desc: "La necesidad despierta el ingenio y el carácter. Enseña a tus hijos el valor del esfuerzo y a hacer más con menos.", icon: "flame", ref: "1 Samuel 17:34-36" },
+          { title: "3. Rompe la Trampa", desc: "No existe la deuda buena. No normalices deber dinero ni comprometas tu libertad con créditos asfixiantes.", icon: "lock-keyhole-open", ref: "2 Reyes 4:1" },
+          { title: "4. Mente de Hormiga", desc: "Guarda en el verano para tener en el invierno. Ahorra hasta el 50% antes de asumir compromisos mayores.", icon: "warehouse", ref: "Proverbios 6:6-8" },
+          { title: "5. Prioriza tu Paz", desc: "Cuando estás endeudado vende lo que tengas. Es mejor perder en un negocio que ser esclavo del acreedor.", icon: "shield", ref: "Salmo 124:7" },
+          { title: "6. Fidelidad en lo Poco", desc: "La abundancia de Su Presencia hoy es fruto de 15 años de vivir en escasez y ser íntegros con Dios.", icon: "sparkles", ref: "Mateo 25:23" }
+        ],
+        anecdotes: [
+          { title: "Caminar a pie en Funza", desc: "8 años sin carro caminando kilómetros al paradero y a la iglesia. Eso ahorró pasajes y gastos médicos." },
+          { title: "La cuenta de $39.000 en limonadas", desc: "Gente endeudada que pide domicilios o bebidas caras en restaurantes sin tener con qué pagarlas." },
+          { title: "Escribiendo a máquina a los 13 años", desc: "Traducía cartas de niños apadrinados. Ahí entendió lo difícil que es ganar un peso y compró sus primeras cosas." },
+          { title: "Bafles caseros en la calle 9ª con 19", desc: "Sin presupuesto para sonido, armó bafles con madera y bocinas de segunda en el centro de Bogotá." },
+          { title: "Micrófonos en la luna de miel", desc: "En vez de toallas o lujos, trajo micrófonos y un mezclador para el inicio de la iglesia." },
+          { title: "La trampa del crédito en 1995", desc: "Compró un apartamento por impulso y la deuda subió de 35 a 42 millones. Vendió carro y apartamento para ser libre." }
+        ],
+        scriptures: [
+          { ref: "Filipenses 4:12", desc: "Pablo aprendió a vivir saciado y a tener hambre; el contentamiento no depende de las circunstancias externas." },
+          { ref: "Proverbios 10:22", desc: "La bendición de Dios es la que enriquece y no añade tristeza." },
+          { ref: "Romanos 8:28", desc: "Dios usa todas las cosas, incluso las temporadas de escasez, para formar nuestro bien." },
+          { ref: "Génesis 14:23", desc: "Abraham rechazó el dinero del rey de Sodoma para que nadie dijera jamás que enriqueció al siervo de Dios." },
+          { ref: "Proverbios 10:4", desc: "La mano diligente enriquece y abre puertas delante de reyes." },
+          { ref: "1 Samuel 17:34-36", desc: "David enfrentó al león y al oso en el desierto; la dificultad despierta al guerrero interior." },
+          { ref: "Proverbios 6:6-8", desc: "Mira la hormiga: sin capitán ni gobernador, recoge su sustento en el verano para el invierno." },
+          { ref: "2 Reyes 4:1-7", desc: "El acreedor venía por los hijos de la viuda. La orden profética fue radical: paga primero tus deudas." },
+          { ref: "Salmo 124:7", desc: "Nuestra alma escapó cual ave del lazo de los cazadores; el lazo se rompió y fuimos libres." },
+          { ref: "Mateo 25:23", desc: "En lo poco has sido fiel, sobre mucho te pondré; entra en el gozo de tu señor." }
+        ],
+        checklist: [
+          "Auditoría inmediata de deudas bancarias y solicitud de tablas de amortización reales.",
+          "Corte radical de gastos hormiga, salidas a restaurantes y compras impulsivas.",
+          "Venta voluntaria de activos no esenciales para amortizar y liquidar acreedores.",
+          "Establecer meta de ahorro mensual sistemático antes de asumir nuevos compromisos."
+        ],
+        quote: "Así como el sexo solo se disfruta en el matrimonio, la vida solo se disfruta plenamente cuando no tienes ni una sola deuda.",
+        tags: ["Finanzas", "Libertad", "Ahorro", "Disciplina", "Fe"]
+      },
+      {
+        id: "2",
+        title: "El legado es más que la herencia",
+        preacher: "Andrés Corson",
+        date: "4 Octubre 2026",
+        series: "Legado & Familia",
+        videoUrl: "https://www.youtube.com/watch?v=GxEKWjGsQcc",
+        anchorScripture: "Lucas 15:11-24",
+        bigIdea: "La herencia es el patrimonio material que dejamos a los hijos; el legado son los principios espirituales y valores que dejamos en ellos.",
+        pillars: [
+          { title: "1. La Trampa de la Herencia", desc: "El hijo pródigo malgastó la herencia en una marranera. Los bienes sin madurez espiritual solo aceleran la autodestrucción.", icon: "coins", ref: "Lucas 15:11-24" },
+          { title: "2. La Presencia ante Todo", desc: "David no entregó el trono por capricho; buscó quien amara el arca del pacto. La adoración y la unción son el mayor tesoro.", icon: "heart", ref: "Salmo 27:4" },
+          { title: "3. Cuidado con las Alianzas", desc: "Salomón desvió su corazón con amores extranjeros. Unirse a quienes no temen a Dios infecta el propósito y divide reinos.", icon: "shield-alert", ref: "1 Reyes 11:1-11" },
+          { title: "4. Honra tu Herencia Espiritual", desc: "No tomes partido con el diablo ni hables mal de la iglesia ni de tus padres. Dios guarda pacto con quienes honran a sus progenitores.", icon: "flame", ref: "2 Crónicas 21:7" },
+          { title: "5. Negación y Sacrificio", desc: "El llamado no es fama ni comodidades en tarima; es orar de madrugada, dejar comodidades y pagar el precio por las almas.", icon: "cross", ref: "Mateo 16:24" },
+          { title: "6. Oír y Obedecer al Instante", desc: "Afinar el oído cada mañana y obedecer sin cuestionar. La fe no se fundamenta en recursos visibles sino en la orden divina.", icon: "volume-2", ref: "Juan 10:27" }
+        ],
+        anecdotes: [
+          { title: "Las 12 Vacas y Tierra y Ganado", desc: "Andrés intentó seguir el legado ganadero de su esposa hasta entender que Dios lo había apartado para el sacerdocio espiritual." },
+          { title: "Las 2 Monedas en la Estación de Tren", desc: "Su abuelo dio sus últimas monedas a un hambriento para predicarle; al llegar a pie recibió milagrosamente un cheque por 2.000 libras." },
+          { title: "El Compás sobre Zipaquirá", desc: "Guiado por el Espíritu Santo, su abuelo trazó un radio de 200 km en Cundinamarca y profetizó la llegada de 50 misioneros que Dios cumplió en 8 años." },
+          { title: "Versículos Escritos en las Piedras", desc: "Pioneros que cosechaban solo 3 convertidos al año bajo persecución pintaban versículos en piedras. Su perseverancia abrió la cosecha actual." },
+          { title: "Dejar la Universidad a la Mitad", desc: "Dios le pidió a Andrés salir de su carrera dos veces para estudiar teología en Berea y fundar la iglesia celular Su Presencia." },
+          { title: "El Precio de la Madrugada", desc: "Orar a diario y predicar 8 veces sin vida social no es emoción; es la cruz de quien elige pagar el precio del llamado." }
+        ],
+        scriptures: [
+          { ref: "Lucas 15:17", desc: "En la marranera el hijo pródigo comprendió que los jornaleros tenían comida y volvió por el legado del padre." },
+          { ref: "Hechos 13:22", desc: "Dios halló en David un corazón dispuesto a hacer toda su voluntad por encima de la gloria humana." },
+          { ref: "1 Reyes 3:11", desc: "Salomón pidió sabiduría para guiar al pueblo y Dios le añadió riquezas y honor que no había pedido." },
+          { ref: "Gálatas 6:9", desc: "No nos cansemos de hacer el bien, porque a su tiempo segaremos si no desmayamos." }
+        ],
+        checklist: [
+          "Priorizar la transmisión de valores y fe en mis hijos antes que solo acumular bienes o herencias materiales.",
+          "Renunciar a la crítica contra mis padres o líderes espirituales y honrar la semilla de fe que dejaron.",
+          "Separar un tiempo diario no negociable de oración matutina para afinar el oído al Espíritu Santo.",
+          "Estar dispuesto a sacrificar comodidades o anhelos personales para obedecer el llamado de Dios."
+        ],
+        quote: "Si Jesucristo es Dios y murió por mí, ningún sacrificio es demasiado grande que yo no pueda hacer por Él.",
+        tags: ["Legado", "Herencia", "Familia", "Sacrificio", "Santidad"]
+      }
+    ];
+
+    let sermonsData = [...DEFAULT_SERMONS];
+
+    // CARGA TRANSPARENTE EN SEGUNDO PLANO
+    async function initLibrary() {
+      try {
+        if (GOOGLE_SHEET_CSV_URL && !GOOGLE_SHEET_CSV_URL.includes("2PACX-1vQ...")) {
+          const response = await fetch(GOOGLE_SHEET_CSV_URL);
+          if (response.ok) {
+            const csvText = await response.text();
+            const parsed = parseCsv(csvText);
+            if (parsed.length > 0) sermonsData = parsed;
+          }
+        }
+      } catch (e) {
+        console.warn("Utilizando biblioteca local:", e);
+      } finally {
+        document.getElementById('loading-spinner').classList.add('hidden');
+        document.getElementById('sermons-grid').classList.remove('hidden');
+        renderSermons(sermonsData);
+      }
+    }
+
+    function parseCsv(text) {
+      const lines = text.trim().split('\n');
+      if (lines.length < 2) return [];
+      const result = [];
+      for (let i = 1; i < lines.length; i++) {
+        const row = lines[i];
+        const matches = row.match(/(".*?"|[^",\s]+)(?=\s*,|\s*$)/g);
+        if (matches && matches.length >= 10) {
+          try {
+            result.push({
+              id: matches[0].replace(/"/g, ''),
+              title: matches[1].replace(/"/g, ''),
+              preacher: matches[2].replace(/"/g, ''),
+              date: matches[3].replace(/"/g, ''),
+              series: matches[4].replace(/"/g, ''),
+              videoUrl: matches[5].replace(/"/g, ''),
+              anchorScripture: matches[6].replace(/"/g, ''),
+              bigIdea: matches[7].replace(/"/g, ''),
+              pillars: JSON.parse(matches[8].replace(/^"|"$/g, '').replace(/""/g, '"')),
+              anecdotes: JSON.parse(matches[9].replace(/^"|"$/g, '').replace(/""/g, '"')),
+              scriptures: JSON.parse(matches[10].replace(/^"|"$/g, '').replace(/""/g, '"')),
+              checklist: JSON.parse(matches[11].replace(/^"|"$/g, '').replace(/""/g, '"')),
+              quote: matches[12] ? matches[12].replace(/"/g, '') : '',
+              tags: matches[13] ? matches[13].replace(/"/g, '').split(',') : []
+            });
+          } catch(e) {}
+        }
+      }
+      return result;
+    }
+
+    function renderSermons(list) {
+      const grid = document.getElementById('sermons-grid');
+      const empty = document.getElementById('empty-state');
+      grid.innerHTML = '';
+
+      if (list.length === 0) {
+        grid.classList.add('hidden');
+        empty.classList.remove('hidden');
+        return;
+      }
+
+      empty.classList.add('hidden');
+      grid.classList.remove('hidden');
+
+      list.forEach(sermon => {
+        const card = document.createElement('div');
+        card.className = "bg-white border border-[#E3DCD2] rounded-3xl p-6 shadow-sm hover:shadow-xl transition-all duration-300 flex flex-col justify-between group cursor-pointer hover:border-[#1D3528]/40";
+        card.onclick = () => openInfographic(sermon);
+
+        card.innerHTML = `
+          <div>
+            <div class="flex items-center justify-between text-xs text-stone-500 mb-4 pb-3 border-b border-stone-100">
+              <span class="inline-flex items-center gap-1 font-semibold text-[#A85138]">
+                <i data-lucide="bookmark" class="w-3.5 h-3.5"></i>
+                ${sermon.series}
+              </span>
+              <span>${sermon.date}</span>
+            </div>
+
+            <h3 class="font-serif-title text-xl font-bold text-[#1D3528] group-hover:text-[#A85138] transition leading-snug mb-3">
+              ${sermon.title}
+            </h3>
+
+            <p class="text-xs text-stone-600 line-clamp-2 mb-4 leading-relaxed font-normal">
+              "${sermon.bigIdea}"
+            </p>
+
+            <div class="p-3 bg-[#FAF8F5] rounded-xl border border-[#ECE5DA] mb-4">
+              <span class="text-[11px] font-semibold text-stone-500 uppercase tracking-wider block mb-1">Versículo Ancla</span>
+              <span class="text-xs font-bold text-[#1D3528] flex items-center gap-1.5">
+                <i data-lucide="book" class="w-3.5 h-3.5 text-[#A85138]"></i>
+                ${sermon.anchorScripture}
+              </span>
+            </div>
+          </div>
+
+          <div>
+            <div class="flex items-center justify-between pt-4 border-t border-stone-100 text-xs">
+              <span class="font-medium text-stone-600 flex items-center gap-1.5">
+                <i data-lucide="user" class="w-3.5 h-3.5 text-stone-400"></i>
+                ${sermon
